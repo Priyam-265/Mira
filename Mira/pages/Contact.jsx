@@ -12,7 +12,7 @@ function Contact() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null); // 'success' or 'error'
-
+  const public_id=import.meta.env.VITE_PUBLIC_ID;
   useEffect(() => {
     // Load EmailJS
     const emailJSScript = document.createElement('script');
@@ -21,7 +21,7 @@ function Contact() {
     emailJSScript.onload = () => {
       if (window.emailjs) {
         // Replace 'YOUR_PUBLIC_KEY' with your actual EmailJS public key
-        window.emailjs.init('cJveqqmdPL2jHG9f1');
+        window.emailjs.init(public_id);
       }
     };
     document.body.appendChild(emailJSScript);
@@ -123,7 +123,8 @@ function Contact() {
       [e.target.name]: e.target.value
     });
   };
-
+  const service_id=import.meta.env.VITE_SERVICE_ID;
+  const template_id=import.meta.env.VITE_TEMPLATE_ID;
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -142,8 +143,8 @@ function Contact() {
 
         // Replace 'YOUR_SERVICE_ID' and 'YOUR_TEMPLATE_ID' with your actual IDs
         await window.emailjs.send(
-          'service_4pf06go',
-          'template_thz6ciq',
+          service_id,
+          template_id,
           templateParams
         );
 
