@@ -1,9 +1,9 @@
-🎀 Mira – Capture Moments, Create Memories
-
+🎀 MIRA — CAPTURE MOMENTS, CREATE MEMORIES
 A beautiful, modern photo-booth web app for capturing and sharing life's precious moments.
+
 Smooth UI • Stunning layouts • Aesthetic filters • Camera magic ✨
 
-🌟 Features
+🌟 FEATURES
 🎭 Stunning UI/UX
 
 Pink & rose gradient theme
@@ -30,11 +30,11 @@ Clean, modular code
 
 EmailJS integration
 
-Real-time form validation
+Real-time validation
 
 Success & error notifications
 
-Mobile-friendly contact form
+Mobile-friendly design
 
 🎨 Customizable
 
@@ -44,7 +44,7 @@ Well-structured components
 
 Developer-friendly setup
 
-🚀 Quick Start
+🚀 QUICK START
 Prerequisites
 
 Node.js 16+
@@ -68,10 +68,10 @@ npm run dev
 
 
 Your app will run at:
-http://localhost:5173
+👉 http://localhost:5173
  🎉
 
-📁 Project Structure
+📁 PROJECT STRUCTURE
 mira/
 ├── public/
 │   ├── index.html
@@ -88,13 +88,13 @@ mira/
 ├── package.json
 └── README.md
 
-⚙️ EmailJS Setup
+⚙️ EMAILJS SETUP
 
 Sign up at EmailJS
 
 Create an email service
 
-Create a template using these variables:
+Add template variables:
 
 {{from_name}}
 {{from_email}}
@@ -102,32 +102,26 @@ Create a template using these variables:
 {{message}}
 
 
-Add your keys inside Contact.jsx:
+Add your keys in Contact.jsx:
 
 // Initialize
 window.emailjs.init('YOUR_PUBLIC_KEY');
 
-// Send
+// Send Email
 await window.emailjs.send(
   'YOUR_SERVICE_ID',
   'YOUR_TEMPLATE_ID',
   templateParams
 );
 
-🎨 Customization
+🎨 CUSTOMIZATION
 Colors
-
-Modify gradients anywhere:
-
 background: 'linear-gradient(135deg, #fdf2f8, #fce7f3, #fbcfe8)'
 
 Fonts
-
-Replace Google Fonts:
-
 @import url('https://fonts.googleapis.com/css2?family=YourFont&display=swap');
 
-🛠 Built With
+🛠 BUILT WITH
 
 React
 
@@ -139,27 +133,27 @@ EmailJS
 
 Lucide Icons
 
-🤝 Contributing
+🤝 CONTRIBUTING
 
-Contributions are always welcome!
+Contributions are welcome!
 
 Fork → Create Feature Branch → Commit → Push → Open PR
 
-📝 License
+📝 LICENSE
 
 Distributed under the MIT License.
 
-👨‍💻 Author
+👨‍💻 AUTHOR
 
 Priyam
 GitHub: https://github.com/Priyam-265
 
 Email: mira.capturemoments@gmail.com
 
-🌟 Show Your Support
+🌟 SHOW YOUR SUPPORT
 
-If you like this project, give it a ⭐ — it helps a lot!
+If you like this project, please give it a ⭐ — it helps a lot!
 
-💖 Made with love 
+💖 MADE WITH LOVE
 
 Mira © 2025 — Crafted with passion.
