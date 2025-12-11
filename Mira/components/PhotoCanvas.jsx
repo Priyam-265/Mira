@@ -85,46 +85,56 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
 
     // Draw pattern if selected
     if (framePattern.id !== 'none') {
-      ctx.font = `bold ${isMobile ? 20 : 28}px Arial`;
+      const fontSize = isMobile ? 24 : 32;
+      ctx.font = `bold ${fontSize}px Arial`;
       ctx.fillStyle = framePattern.color || 'rgba(0, 0, 0, 0.4)';
       ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-      ctx.shadowBlur = 2;
+      ctx.shadowBlur = 3;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
       
-      const spacing = isMobile ? 30 : 40;
-      const borderThickness = isMobile ? 50 : 65;
+      const spacing = isMobile ? 38 : 48;
+      const edgeMargin = 25;
+      const borderZoneSize = isMobile ? 60 : 80;
       
-      // Top border
-      for (let j = 30; j < borderThickness; j += spacing) {
-        for (let i = 30; i < width - 30; i += spacing) {
-          ctx.fillText(framePattern.emoji, i, j);
+      // Top border - 2 rows
+      for (let row = 0; row < 2; row++) {
+        const y = edgeMargin + (row * spacing) + spacing/2;
+        for (let x = edgeMargin + spacing/2; x < width - edgeMargin; x += spacing) {
+          ctx.fillText(framePattern.emoji, x, y);
         }
       }
       
-      // Bottom border
-      for (let j = height - borderThickness + 30; j < height - 20; j += spacing) {
-        for (let i = 30; i < width - 30; i += spacing) {
-          ctx.fillText(framePattern.emoji, i, j);
+      // Bottom border - 2 rows
+      for (let row = 0; row < 2; row++) {
+        const y = height - edgeMargin - (row * spacing) - spacing/2;
+        for (let x = edgeMargin + spacing/2; x < width - edgeMargin; x += spacing) {
+          ctx.fillText(framePattern.emoji, x, y);
         }
       }
       
-      // Left border
-      for (let i = 30; i < borderThickness; i += spacing) {
-        for (let j = borderThickness + 30; j < height - borderThickness; j += spacing) {
-          ctx.fillText(framePattern.emoji, i, j);
+      // Left border - 2 columns (avoiding corners)
+      for (let col = 0; col < 2; col++) {
+        const x = edgeMargin + (col * spacing) + spacing/2;
+        for (let y = borderZoneSize + spacing/2; y < height - borderZoneSize; y += spacing) {
+          ctx.fillText(framePattern.emoji, x, y);
         }
       }
       
-      // Right border
-      for (let i = width - borderThickness + 30; i < width - 20; i += spacing) {
-        for (let j = borderThickness + 30; j < height - borderThickness; j += spacing) {
-          ctx.fillText(framePattern.emoji, i, j);
+      // Right border - 2 columns (avoiding corners)
+      for (let col = 0; col < 2; col++) {
+        const x = width - edgeMargin - (col * spacing) - spacing/2;
+        for (let y = borderZoneSize + spacing/2; y < height - borderZoneSize; y += spacing) {
+          ctx.fillText(framePattern.emoji, x, y);
         }
       }
       
       ctx.shadowBlur = 0;
+      ctx.textAlign = 'start';
+      ctx.textBaseline = 'alphabetic';
     }
 
-    const padding = isMobile ? 40 : 50;
+    const padding = isMobile ? 70 : 90;
     const photoSpacing = isMobile ? 15 : 20;
     let loadedCount = 0;
     const totalPhotos = photos.length;
@@ -157,7 +167,6 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
           ctx.save();
           ctx.filter = getFilterStyle(filter);
           
-          // Calculate aspect ratio for proper fitting
           const imgAspect = img.width / img.height;
           const frameAspect = photoWidth / photoHeight;
           let drawWidth, drawHeight, drawX, drawY;
@@ -224,7 +233,6 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
           
           ctx.filter = getFilterStyle(filter);
           
-          // Proper aspect ratio handling
           const imgAspect = img.width / img.height;
           const frameAspect = photoWidth / photoHeight;
           let drawWidth, drawHeight, drawX, drawY;
@@ -305,7 +313,6 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
           loadedCount++;
           const y = padding + idx * (photoHeight + photoSpacing);
           
-          // Film sprocket holes
           ctx.fillStyle = frameColor.border;
           const holeSpacing = isMobile ? 35 : 40;
           for (let i = padding - (isMobile ? 25 : 30); i < height; i += holeSpacing) {
@@ -322,7 +329,6 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
           ctx.clip();
           ctx.filter = getFilterStyle(filter);
           
-          // Proper aspect ratio
           const imgAspect = img.width / img.height;
           const frameAspect = photoWidth / photoHeight;
           let drawWidth, drawHeight, drawX, drawY;
@@ -378,7 +384,6 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
           ctx.clip();
           ctx.filter = getFilterStyle(filter);
           
-          // Proper aspect ratio
           const imgAspect = img.width / img.height;
           const frameAspect = photoWidth / photoHeight;
           let drawWidth, drawHeight, drawX, drawY;
@@ -519,7 +524,6 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-3 sm:p-4 md:p-6 border border-pink-200">
-      {/* Header */}
       <div className={`${isMobile ? 'sticky top-0 z-10 bg-white pb-3 -mx-3 px-3 pt-3 shadow-sm' : ''} flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4`}>
         <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800" style={{ fontFamily: 'Outfit, sans-serif' }}>Your Photo Strip</h3>
         <div className="flex gap-2 w-full sm:w-auto">
@@ -542,7 +546,6 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
         </div>
       </div>
 
-      {/* Canvas Container */}
       <div className="flex justify-center bg-gray-50 rounded-lg p-2 sm:p-4 mb-3 sm:mb-4">
         <canvas 
           ref={displayCanvasRef} 
@@ -563,7 +566,6 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
         />
       </div>
 
-      {/* Sticker Controls */}
       {selectedSticker && (
         <div className={`${isMobile ? 'sticky bottom-0 z-10 bg-white pt-3 -mx-3 px-3 pb-3 shadow-lg border-t border-pink-100' : 'mb-4'} bg-gradient-to-r from-pink-50 to-rose-50 border-2 border-pink-300 rounded-lg p-4`}>
           <h4 className="font-bold text-gray-800 mb-3 text-sm flex items-center gap-2" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -618,7 +620,6 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
         </div>
       )}
 
-      {/* All Stickers List */}
       {stickers.length > 0 && (
         <div>
           <h4 className="font-semibold text-gray-700 mb-2 text-xs sm:text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
