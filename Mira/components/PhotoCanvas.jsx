@@ -1,11 +1,15 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Trash2, ZoomIn, ZoomOut, Download, RotateCw } from 'lucide-react';
+import { Trash2, ZoomIn, ZoomOut, Download, RotateCw, ArrowLeft, Move } from 'lucide-react';
 
-function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, stickers, onUpdateStickers, canvasRef, onReset }) {
+function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, stickers, onUpdateStickers, canvasRef, onReset, onBackToCamera }) {
   const displayCanvasRef = useRef(null);
   const [draggedSticker, setDraggedSticker] = useState(null);
   const [selectedSticker, setSelectedSticker] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [touchStartDistance, setTouchStartDistance] = useState(null);
+  const [touchStartRotation, setTouchStartRotation] = useState(null);
+  const [initialStickerSize, setInitialStickerSize] = useState(null);
+  const [initialStickerRotation, setInitialStickerRotation] = useState(null);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -42,9 +46,8 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
     const canvas = displayCanvasRef.current;
     if (!canvas || photos.length === 0) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     
-    // Responsive canvas sizing
     let width = isMobile ? 400 : 600;
     let height = isMobile ? 800 : 900;
     
@@ -62,7 +65,6 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
     canvas.width = width;
     canvas.height = height;
 
-    // Apply frame background
     if (frameColor.bg.startsWith('linear-gradient')) {
       const colors = frameColor.bg.match(/#[0-9a-f]{6}/gi);
       if (colors && colors.length >= 2) {
@@ -78,12 +80,10 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
     }
     ctx.fillRect(0, 0, width, height);
 
-    // Draw decorative border
     ctx.strokeStyle = frameColor.border;
     ctx.lineWidth = isMobile ? 6 : 8;
     ctx.strokeRect(10, 10, width - 20, height - 20);
 
-    // Draw pattern if selected
     if (framePattern.id !== 'none') {
       const fontSize = isMobile ? 24 : 32;
       ctx.font = `bold ${fontSize}px Arial`;
@@ -97,7 +97,6 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
       const edgeMargin = 25;
       const borderZoneSize = isMobile ? 60 : 80;
       
-      // Top border - 2 rows
       for (let row = 0; row < 2; row++) {
         const y = edgeMargin + (row * spacing) + spacing/2;
         for (let x = edgeMargin + spacing/2; x < width - edgeMargin; x += spacing) {
@@ -105,7 +104,6 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
         }
       }
       
-      // Bottom border - 2 rows
       for (let row = 0; row < 2; row++) {
         const y = height - edgeMargin - (row * spacing) - spacing/2;
         for (let x = edgeMargin + spacing/2; x < width - edgeMargin; x += spacing) {
@@ -113,7 +111,6 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
         }
       }
       
-      // Left border - 2 columns (avoiding corners)
       for (let col = 0; col < 2; col++) {
         const x = edgeMargin + (col * spacing) + spacing/2;
         for (let y = borderZoneSize + spacing/2; y < height - borderZoneSize; y += spacing) {
@@ -121,7 +118,6 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
         }
       }
       
-      // Right border - 2 columns (avoiding corners)
       for (let col = 0; col < 2; col++) {
         const x = width - edgeMargin - (col * spacing) - spacing/2;
         for (let y = borderZoneSize + spacing/2; y < height - borderZoneSize; y += spacing) {
@@ -157,6 +153,7 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
 
       photos.forEach((photo, idx) => {
         const img = new Image();
+        img.crossOrigin = "anonymous";
         img.onload = () => {
           loadedCount++;
           const y = padding + idx * (photoHeight + photoSpacing);
@@ -206,6 +203,7 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
 
       photos.forEach((photo, idx) => {
         const img = new Image();
+        img.crossOrigin = "anonymous";
         img.onload = () => {
           loadedCount++;
           const x = startX;
@@ -267,6 +265,7 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
 
       photosToShow.forEach((photo, idx) => {
         const img = new Image();
+        img.crossOrigin = "anonymous";
         img.onload = () => {
           loadedCount++;
           const centerX = width / 2;
@@ -309,6 +308,7 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
 
       photos.forEach((photo, idx) => {
         const img = new Image();
+        img.crossOrigin = "anonymous";
         img.onload = () => {
           loadedCount++;
           const y = padding + idx * (photoHeight + photoSpacing);
@@ -365,6 +365,7 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
       
       photos.forEach((photo, idx) => {
         const img = new Image();
+        img.crossOrigin = "anonymous";
         img.onload = () => {
           loadedCount++;
           const row = Math.floor(idx / 2);
@@ -410,13 +411,36 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
     }
   };
 
+  const getDistance = (touch1, touch2) => {
+    const dx = touch1.clientX - touch2.clientX;
+    const dy = touch1.clientY - touch2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  const getAngle = (touch1, touch2) => {
+    return Math.atan2(touch2.clientY - touch1.clientY, touch2.clientX - touch1.clientX) * 180 / Math.PI;
+  };
+
   const handleDownload = () => {
     const canvas = displayCanvasRef.current;
     if (canvas) {
-      const link = document.createElement('a');
-      link.download = `mira-photobooth-${Date.now()}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
+      try {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = `mira-photobooth-${Date.now()}.png`;
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+          }
+        }, 'image/png');
+      } catch (err) {
+        const link = document.createElement('a');
+        link.download = `mira-photobooth-${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }
     }
   };
 
@@ -448,11 +472,96 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
     }));
   };
 
-  const handleCanvasMouseDown = (e) => {
+  const handleTouchStart = (e) => {
+    e.preventDefault();
     const canvas = displayCanvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
+
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      const x = (touch.clientX - rect.left) * scaleX;
+      const y = (touch.clientY - rect.top) * scaleY;
+
+      const clicked = stickers.find(s => {
+        const dx = x - s.x;
+        const dy = y - s.y;
+        const size = s.size || 48;
+        return Math.sqrt(dx * dx + dy * dy) < size;
+      });
+
+      if (clicked) {
+        setDraggedSticker(clicked);
+        setSelectedSticker(clicked);
+      } else {
+        setSelectedSticker(null);
+      }
+    } else if (e.touches.length === 2 && draggedSticker) {
+      const distance = getDistance(e.touches[0], e.touches[1]);
+      const angle = getAngle(e.touches[0], e.touches[1]);
+      setTouchStartDistance(distance);
+      setTouchStartRotation(angle);
+      setInitialStickerSize(draggedSticker.size || 48);
+      setInitialStickerRotation(draggedSticker.rotation || 0);
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (!draggedSticker) return;
+    e.preventDefault();
+
+    const canvas = displayCanvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      const x = (touch.clientX - rect.left) * scaleX;
+      const y = (touch.clientY - rect.top) * scaleY;
+
+      onUpdateStickers(stickers.map(s => 
+        s.id === draggedSticker.id ? { ...s, x, y } : s
+      ));
+    } else if (e.touches.length === 2 && touchStartDistance && touchStartRotation !== null) {
+      const currentDistance = getDistance(e.touches[0], e.touches[1]);
+      const currentAngle = getAngle(e.touches[0], e.touches[1]);
+      
+      const scaleFactor = currentDistance / touchStartDistance;
+      const newSize = Math.max(24, Math.min(120, initialStickerSize * scaleFactor));
+      
+      const angleDiff = currentAngle - touchStartRotation;
+      const newRotation = (initialStickerRotation + angleDiff) % 360;
+
+      onUpdateStickers(stickers.map(s => 
+        s.id === draggedSticker.id 
+          ? { ...s, size: newSize, rotation: newRotation }
+          : s
+      ));
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    e.preventDefault();
+    if (e.touches.length === 0) {
+      setDraggedSticker(null);
+      setTouchStartDistance(null);
+      setTouchStartRotation(null);
+      setInitialStickerSize(null);
+      setInitialStickerRotation(null);
+    } else if (e.touches.length === 1) {
+      setTouchStartDistance(null);
+      setTouchStartRotation(null);
+    }
+  };
+
+  const handleMouseDown = (e) => {
+    const canvas = displayCanvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
 
@@ -460,7 +569,7 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
       const dx = x - s.x;
       const dy = y - s.y;
       const size = s.size || 48;
-      return Math.sqrt(dx * dx + dy * dy) < size / 2;
+      return Math.sqrt(dx * dx + dy * dy) < size;
     });
 
     if (clicked) {
@@ -471,30 +580,7 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
     }
   };
 
-  const handleCanvasTouchStart = (e) => {
-    const touch = e.touches[0];
-    const canvas = displayCanvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const x = (touch.clientX - rect.left) * scaleX;
-    const y = (touch.clientY - rect.top) * scaleY;
-
-    const clicked = stickers.find(s => {
-      const dx = x - s.x;
-      const dy = y - s.y;
-      const size = s.size || 48;
-      return Math.sqrt(dx * dx + dy * dy) < size / 2;
-    });
-
-    if (clicked) {
-      e.preventDefault();
-      setDraggedSticker(clicked);
-      setSelectedSticker(clicked);
-    }
-  };
-
-  const handleCanvasMove = (e) => {
+  const handleMouseMove = (e) => {
     if (!draggedSticker) return;
 
     const canvas = displayCanvasRef.current;
@@ -502,23 +588,15 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
     
-    let x, y;
-    if (e.type.includes('touch')) {
-      e.preventDefault();
-      const touch = e.touches[0];
-      x = (touch.clientX - rect.left) * scaleX;
-      y = (touch.clientY - rect.top) * scaleY;
-    } else {
-      x = (e.clientX - rect.left) * scaleX;
-      y = (e.clientY - rect.top) * scaleY;
-    }
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
 
     onUpdateStickers(stickers.map(s => 
       s.id === draggedSticker.id ? { ...s, x, y } : s
     ));
   };
 
-  const handleCanvasEnd = () => {
+  const handleMouseUp = () => {
     setDraggedSticker(null);
   };
 
@@ -526,7 +604,15 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
     <div className="bg-white rounded-xl shadow-lg p-3 sm:p-4 md:p-6 border border-pink-200">
       <div className={`${isMobile ? 'sticky top-0 z-10 bg-white pb-3 -mx-3 px-3 pt-3 shadow-sm' : ''} flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4`}>
         <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800" style={{ fontFamily: 'Outfit, sans-serif' }}>Your Photo Strip</h3>
-        <div className="flex gap-2 w-full sm:w-auto">
+        <div className="flex gap-2 w-full sm:w-auto flex-wrap">
+          <button
+            onClick={onBackToCamera}
+            className="flex-1 sm:flex-none bg-gray-100 text-gray-700 px-3 sm:px-4 py-2 rounded-lg font-semibold hover:bg-gray-200 transition-all text-xs sm:text-sm flex items-center justify-center gap-1 sm:gap-2"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            <ArrowLeft size={16} />
+            <span>Change Photos</span>
+          </button>
           <button
             onClick={handleDownload}
             className="flex-1 sm:flex-none bg-gradient-to-r from-pink-400 to-rose-400 text-white px-3 sm:px-4 py-2 rounded-lg font-semibold shadow hover:shadow-lg transition-all hover:scale-105 text-xs sm:text-sm flex items-center justify-center gap-1 sm:gap-2"
@@ -537,7 +623,7 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
           </button>
           <button
             onClick={onReset}
-            className="flex-1 sm:flex-none bg-gray-200 text-gray-700 px-3 sm:px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-all text-xs sm:text-sm flex items-center justify-center gap-1 sm:gap-2"
+            className="flex-1 sm:flex-none bg-red-100 text-red-700 px-3 sm:px-4 py-2 rounded-lg font-semibold hover:bg-red-200 transition-all text-xs sm:text-sm flex items-center justify-center gap-1 sm:gap-2"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
             <RotateCw size={16} />
@@ -554,17 +640,33 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
             maxHeight: isMobile ? '65vh' : '500px',
             width: '100%',
             objectFit: 'contain',
-            touchAction: 'none'
+            touchAction: 'none',
+            WebkitTouchCallout: 'none',
+            WebkitUserSelect: 'none',
+            userSelect: 'none'
           }}
-          onMouseDown={handleCanvasMouseDown}
-          onMouseMove={handleCanvasMove}
-          onMouseUp={handleCanvasEnd}
-          onMouseLeave={handleCanvasEnd}
-          onTouchStart={handleCanvasTouchStart}
-          onTouchMove={handleCanvasMove}
-          onTouchEnd={handleCanvasEnd}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         />
       </div>
+
+      {isMobile && selectedSticker && (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-lg p-4 mb-4">
+          <h4 className="font-bold text-gray-800 mb-2 text-sm flex items-center gap-2" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <Move size={18} className="text-blue-500" />
+            <span>Touch Gestures</span>
+          </h4>
+          <ul className="text-xs text-gray-700 space-y-1" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <li>👆 <strong>1 finger:</strong> Drag to move</li>
+            <li>✌️ <strong>2 fingers:</strong> Pinch to resize & rotate</li>
+          </ul>
+        </div>
+      )}
 
       {selectedSticker && (
         <div className={`${isMobile ? 'sticky bottom-0 z-10 bg-white pt-3 -mx-3 px-3 pb-3 shadow-lg border-t border-pink-100' : 'mb-4'} bg-gradient-to-r from-pink-50 to-rose-50 border-2 border-pink-300 rounded-lg p-4`}>
@@ -595,7 +697,7 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               <RotateCw size={16} className="transform -scale-x-100" />
-              Rotate Left
+              Left
             </button>
             <button
               onClick={() => rotateSticker(selectedSticker.id, 15)}
@@ -603,7 +705,7 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               <RotateCw size={16} />
-              Rotate Right
+              Right
             </button>
             <button
               onClick={() => removeSticker(selectedSticker.id)}
@@ -615,7 +717,7 @@ function PhotoCanvas({ photos, layout, filter, frameColor, framePattern, sticker
             </button>
           </div>
           <p className="text-xs text-gray-600 mt-3" style={{ fontFamily: 'Inter, sans-serif' }}>
-            💡 Drag the sticker on the photo to move it around
+            {isMobile ? '💡 Use 1 finger to move, 2 fingers to resize & rotate' : '💡 Click and drag the sticker to move it'}
           </p>
         </div>
       )}

@@ -22,6 +22,7 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
       imageRef.current = img;
       renderPreview();
     };
+    img.crossOrigin = "anonymous";
     img.src = photo;
   }, [photo]);
 
@@ -36,33 +37,22 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
     const img = imageRef.current;
     if (!canvas || !img) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     canvas.width = 800;
     canvas.height = 600;
 
-    // Calculate scaling to fit
     const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
     const x = (canvas.width - img.width * scale) / 2;
     const y = (canvas.height - img.height * scale) / 2;
     const scaledWidth = img.width * scale;
     const scaledHeight = img.height * scale;
 
-    // Clear canvas
     ctx.fillStyle = '#1f2937';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Apply filters
-    ctx.filter = `
-      brightness(${brightness}%) 
-      contrast(${contrast}%) 
-      saturate(${saturation}%)
-      brightness(${exposure}%)
-    `;
-
-    // Draw image
+    ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) brightness(${exposure}%)`;
     ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
 
-    // Apply shadow/highlight overlay
     if (shadows !== 0) {
       ctx.globalCompositeOperation = 'overlay';
       const shadowEffect = Math.abs(shadows) / 100;
@@ -79,19 +69,15 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
       ctx.globalCompositeOperation = 'source-over';
     }
 
-    // Draw crop overlay
     if (cropMode) {
-      // Darken outside crop area
       ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Calculate crop rectangle
       const cropX = x + (cropArea.x / 100) * scaledWidth;
       const cropY = y + (cropArea.y / 100) * scaledHeight;
       const cropW = (cropArea.width / 100) * scaledWidth;
       const cropH = (cropArea.height / 100) * scaledHeight;
       
-      // Clear crop area to show image
       ctx.clearRect(cropX, cropY, cropW, cropH);
       ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) brightness(${exposure}%)`;
       ctx.drawImage(
@@ -106,14 +92,12 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
         cropH
       );
       
-      // Draw crop border
       ctx.strokeStyle = '#f472b6';
       ctx.lineWidth = 3;
       ctx.setLineDash([10, 5]);
       ctx.strokeRect(cropX, cropY, cropW, cropH);
       ctx.setLineDash([]);
       
-      // Draw corner handles
       const handleSize = 12;
       ctx.fillStyle = '#f472b6';
       ctx.fillRect(cropX - handleSize/2, cropY - handleSize/2, handleSize, handleSize);
@@ -125,28 +109,41 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
     ctx.filter = 'none';
   };
 
-  const handleCanvasMouseDown = (e) => {
-    if (!cropMode) return;
-    
+  const getEventCoordinates = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
     
-    setIsDragging(true);
-    setDragStart({ x, y });
+    let clientX, clientY;
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+    
+    const x = ((clientX - rect.left) / rect.width) * 100;
+    const y = ((clientY - rect.top) / rect.height) * 100;
+    
+    return { x, y };
   };
 
-  const handleCanvasMouseMove = (e) => {
+  const handlePointerDown = (e) => {
+    if (!cropMode) return;
+    e.preventDefault();
+    
+    const coords = getEventCoordinates(e);
+    setIsDragging(true);
+    setDragStart(coords);
+  };
+
+  const handlePointerMove = (e) => {
     if (!cropMode || !isDragging) return;
+    e.preventDefault();
     
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    
-    const deltaX = x - dragStart.x;
-    const deltaY = y - dragStart.y;
+    const coords = getEventCoordinates(e);
+    const deltaX = coords.x - dragStart.x;
+    const deltaY = coords.y - dragStart.y;
     
     setCropArea(prev => ({
       ...prev,
@@ -154,20 +151,19 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
       y: Math.max(0, Math.min(100 - prev.height, prev.y + deltaY))
     }));
     
-    setDragStart({ x, y });
+    setDragStart(coords);
   };
 
-  const handleCanvasMouseUp = () => {
+  const handlePointerUp = () => {
     setIsDragging(false);
   };
 
   const handleSave = () => {
     const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     const img = imageRef.current;
 
     if (cropMode) {
-      // Apply crop
       const cropX = (cropArea.x / 100) * img.width;
       const cropY = (cropArea.y / 100) * img.height;
       const cropW = (cropArea.width / 100) * img.width;
@@ -185,7 +181,6 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
       ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) brightness(${exposure}%)`;
       ctx.drawImage(img, 0, 0);
       
-      // Apply shadows/highlights
       if (shadows !== 0) {
         const shadowEffect = Math.abs(shadows) / 100;
         ctx.globalCompositeOperation = 'overlay';
@@ -220,7 +215,6 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
   return (
     <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-0 sm:p-4">
       <div className="bg-white rounded-none sm:rounded-xl shadow-2xl w-full h-full sm:h-[90vh] sm:max-w-6xl flex flex-col">
-        {/* Header */}
         <div className="bg-gradient-to-r from-pink-400 to-rose-400 p-3 sm:p-4 flex justify-between items-center rounded-t-none sm:rounded-t-xl flex-shrink-0">
           <h2 className="text-lg sm:text-xl font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>
             Edit Photo {index + 1}
@@ -233,30 +227,20 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
           </button>
         </div>
 
-        {/* Main Content - Responsive Layout */}
         <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-          {/* Canvas Preview */}
           <div className="flex-1 bg-gray-100 p-2 sm:p-4 flex items-center justify-center min-h-0">
             <div className="relative w-full h-full flex items-center justify-center">
               <canvas
                 ref={canvasRef}
                 className="max-w-full max-h-full rounded-lg shadow-2xl touch-none"
                 style={{ cursor: cropMode ? 'move' : 'default' }}
-                onMouseDown={handleCanvasMouseDown}
-                onMouseMove={handleCanvasMouseMove}
-                onMouseUp={handleCanvasMouseUp}
-                onMouseLeave={handleCanvasMouseUp}
-                onTouchStart={(e) => {
-                  e.preventDefault();
-                  const touch = e.touches[0];
-                  handleCanvasMouseDown({ clientX: touch.clientX, clientY: touch.clientY });
-                }}
-                onTouchMove={(e) => {
-                  e.preventDefault();
-                  const touch = e.touches[0];
-                  handleCanvasMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
-                }}
-                onTouchEnd={handleCanvasMouseUp}
+                onMouseDown={handlePointerDown}
+                onMouseMove={handlePointerMove}
+                onMouseUp={handlePointerUp}
+                onMouseLeave={handlePointerUp}
+                onTouchStart={handlePointerDown}
+                onTouchMove={handlePointerMove}
+                onTouchEnd={handlePointerUp}
               />
               {cropMode && (
                 <div className="absolute top-2 left-2 bg-black/70 text-white px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm flex items-center gap-2">
@@ -268,10 +252,8 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
             </div>
           </div>
 
-          {/* Controls */}
           <div className="w-full lg:w-80 bg-white border-t lg:border-t-0 lg:border-l border-gray-200 overflow-y-auto max-h-64 lg:max-h-none">
             <div className="p-3 sm:p-5 space-y-3 sm:space-y-4">
-              {/* Crop Toggle */}
               <button
                 onClick={() => setCropMode(!cropMode)}
                 className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 text-sm sm:text-base ${
@@ -285,14 +267,12 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
                 {cropMode ? 'Exit Crop Mode' : 'Crop Photo'}
               </button>
 
-              {/* Adjustments */}
               {!cropMode && (
                 <div className="space-y-3 sm:space-y-4">
                   <h3 className="font-bold text-gray-800 text-base sm:text-lg" style={{ fontFamily: 'Outfit, sans-serif' }}>
                     Adjustments
                   </h3>
                   
-                  {/* Brightness */}
                   <div>
                     <div className="flex justify-between mb-1 sm:mb-2">
                       <label className="text-xs sm:text-sm font-medium text-gray-700" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -310,7 +290,6 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
                     />
                   </div>
 
-                  {/* Contrast */}
                   <div>
                     <div className="flex justify-between mb-1 sm:mb-2">
                       <label className="text-xs sm:text-sm font-medium text-gray-700" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -328,7 +307,6 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
                     />
                   </div>
 
-                  {/* Saturation */}
                   <div>
                     <div className="flex justify-between mb-1 sm:mb-2">
                       <label className="text-xs sm:text-sm font-medium text-gray-700" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -346,7 +324,6 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
                     />
                   </div>
 
-                  {/* Exposure */}
                   <div>
                     <div className="flex justify-between mb-1 sm:mb-2">
                       <label className="text-xs sm:text-sm font-medium text-gray-700" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -364,7 +341,6 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
                     />
                   </div>
 
-                  {/* Shadows */}
                   <div>
                     <div className="flex justify-between mb-1 sm:mb-2">
                       <label className="text-xs sm:text-sm font-medium text-gray-700" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -382,7 +358,6 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
                     />
                   </div>
 
-                  {/* Highlights */}
                   <div>
                     <div className="flex justify-between mb-1 sm:mb-2">
                       <label className="text-xs sm:text-sm font-medium text-gray-700" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -414,7 +389,6 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
           </div>
         </div>
 
-        {/* Bottom Action Buttons */}
         <div className="flex gap-2 sm:gap-3 p-3 sm:p-4 bg-gray-50 border-t border-gray-200 flex-shrink-0">
           <button
             onClick={handleReset}
