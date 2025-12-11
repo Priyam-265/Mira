@@ -324,7 +324,7 @@ function CameraComponent({ layout, onComplete, onBack }) {
           <div className="mb-4 sm:mb-6">
             <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2">
               {photos.map((photo, idx) => (
-                <div key={idx} className="flex-shrink-0 relative group">
+                <div key={idx} className="flex-shrink-0 relative">
                   <img
                     src={photo}
                     alt={`Photo ${idx + 1}`}
@@ -332,7 +332,7 @@ function CameraComponent({ layout, onComplete, onBack }) {
                   />
                   <button
                     onClick={() => deletePhoto(idx)}
-                    className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-lg opacity-0 group-hover:opacity-100 transition-all transform hover:scale-110"
+                    className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-lg transition-all transform hover:scale-110"
                     title="Delete photo"
                   >
                     <X size={16} />
