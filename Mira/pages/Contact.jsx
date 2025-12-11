@@ -469,7 +469,7 @@ function Contact() {
 
               <div className="info-card bg-gradient-to-br from-rose-50 to-pink-100 rounded-3xl p-8 shadow-xl border-2 border-rose-200">
                 <div className="bg-gradient-to-br from-rose-400 to-pink-500 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-                  <Github className="text-white" size={32} />
+                  <Instagram className="text-white" size={32} />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-800 mb-3" style={{ fontFamily: 'Outfit, sans-serif' }}>
                   Follow Us
@@ -479,12 +479,12 @@ function Contact() {
                 </p>
                 <div className="flex gap-3">
                   <a 
-                    href="https://github.com/Priyam-265" 
+                    href="https://www.instagram.com/mira.capturemoments?igsh=ZGEwbXVvdG54aHVw" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="social-link bg-gray-800 hover:bg-gray-900 text-white p-3 rounded-xl transition-colors"
+                    className="social-link bg-gradient-to-br from-rose-400 to-pink-500 text-white p-3 rounded-xl transition-colors"
                   >
-                    <Github size={24} />
+                    <Instagram size={24} />
                   </a>
                   <a 
                     href="mailto:mira.capturemoments@gmail.com"
