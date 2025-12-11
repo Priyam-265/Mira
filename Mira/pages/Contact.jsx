@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Github, Mail, Phone, MapPin, Send, MessageSquare, CheckCircle, AlertCircle } from 'lucide-react';
+import { Heart, Github, Mail, Phone, MapPin, Send, MessageSquare, CheckCircle, AlertCircle,Instagram} from 'lucide-react';
 
 function Contact() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -216,12 +216,12 @@ function Contact() {
                 Contact
               </Link>
               <a 
-                href="https://github.com/Priyam-265" 
+                href="https://www.instagram.com/mira.capturemoments?igsh=ZGEwbXVvdG54aHVw" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-gray-700 hover:text-pink-600 transition-colors"
               >
-                <Github size={20} />
+                <Instagram size={20} />
               </a>
             </div>
 
@@ -265,15 +265,15 @@ function Contact() {
               >
                 Contact
               </Link>
-              <a 
-                href="https://github.com/Priyam-265" 
+           <a 
+                href="https://www.instagram.com/mira.capturemoments?igsh=ZGEwbXVvdG54aHVw" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="mobile-menu-item flex items-center gap-2 text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
-                <Github size={20} />
-                <span>GitHub</span>
+                <Instagram size={20} />
+                <span>Instagram</span>
               </a>
             </div>
           </div>
