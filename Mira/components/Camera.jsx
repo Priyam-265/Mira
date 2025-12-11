@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera as CameraIcon, RefreshCw, X, Edit } from 'lucide-react';
+import { Camera, RefreshCw, X } from 'lucide-react';
 
-function Camera({ layout, onComplete, onBack }) {
+function CameraComponent({ layout, onComplete, onBack }) {
   const [photos, setPhotos] = useState([]);
   const [countdown, setCountdown] = useState(0);
   const [cameraReady, setCameraReady] = useState(false);
@@ -76,7 +76,6 @@ function Camera({ layout, onComplete, onBack }) {
       
       if (currentCount === 0) {
         clearInterval(countdownIntervalRef.current);
-        // Wait a brief moment to show 0, then capture
         setTimeout(() => {
           performCapture(photoIndex);
         }, 200);
@@ -102,30 +101,24 @@ function Camera({ layout, onComplete, onBack }) {
     canvas.height = video.videoHeight;
     const ctx = canvas.getContext('2d');
     
-    // Clear canvas first
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Mirror and draw the image
     ctx.save();
     ctx.translate(canvas.width, 0);
     ctx.scale(-1, 1);
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     ctx.restore();
     
-    // Convert to data URL
     const photoData = canvas.toDataURL('image/jpeg', 0.95);
     
-    // Update photos array
     setPhotos(prevPhotos => {
       const newPhotos = [...prevPhotos, photoData];
       
-      // Check if we've captured all photos
       if (newPhotos.length >= layout.slots) {
         setIsCapturing(false);
         stopCamera();
         setShowEditButton(true);
       } else {
-        // Wait before starting next countdown
         setTimeout(() => {
           startCountdown(photoIndex + 1);
         }, 1500);
@@ -150,57 +143,59 @@ function Camera({ layout, onComplete, onBack }) {
   const progress = (photos.length / layout.slots) * 100;
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="bg-white/90 backdrop-blur-md rounded-xl shadow-xl p-6 border border-pink-200">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
+    <div className="w-full max-w-5xl mx-auto px-2 sm:px-4">
+      <div className="bg-white/90 backdrop-blur-md rounded-xl shadow-xl p-3 sm:p-6 border border-pink-200">
+        {/* Header - Mobile Optimized */}
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-0 mb-4 sm:mb-6">
           <button 
             onClick={onBack} 
-            className="text-gray-600 hover:text-gray-800 flex items-center gap-2 font-semibold transition-all hover:scale-105"
+            className="w-full sm:w-auto text-gray-600 hover:text-gray-800 flex items-center justify-center gap-2 font-semibold transition-all hover:scale-105 py-2 sm:py-0"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
-            <X size={20} /> Cancel
+            <X size={18} /> Cancel
           </button>
-          <div className="text-center flex-1">
+          
+          <div className="text-center flex-1 w-full">
             <div 
-              className="text-2xl font-bold text-pink-500"
+              className="text-xl sm:text-2xl font-bold text-pink-500"
               style={{ fontFamily: 'Outfit, sans-serif' }}
             >
               {photos.length} / {layout.slots}
             </div>
-            <div className="w-48 mx-auto mt-2 bg-pink-100 rounded-full h-2">
+            <div className="w-full sm:w-48 mx-auto mt-2 bg-pink-100 rounded-full h-2">
               <div 
                 className="bg-gradient-to-r from-pink-400 to-rose-400 h-full rounded-full transition-all duration-500" 
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
           </div>
+          
           <button 
             onClick={retake} 
-            className="text-pink-500 hover:text-pink-700 flex items-center gap-2 font-semibold transition-all hover:scale-105"
+            className="w-full sm:w-auto text-pink-500 hover:text-pink-700 flex items-center justify-center gap-2 font-semibold transition-all hover:scale-105 py-2 sm:py-0"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
-            <RefreshCw size={20} /> Retake
+            <RefreshCw size={18} /> Retake
           </button>
         </div>
 
-        {/* Camera View */}
-        <div className="relative bg-gray-900 rounded-xl overflow-hidden aspect-video mb-6">
+        {/* Camera View - Responsive */}
+        <div className="relative bg-gray-900 rounded-xl overflow-hidden aspect-video mb-4 sm:mb-6">
           {error && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-800 text-white p-4 text-center z-20">
               <div>
-                <CameraIcon size={48} className="mx-auto mb-4 opacity-50" />
-                <p className="text-xl" style={{ fontFamily: 'Inter, sans-serif' }}>{error}</p>
+                <Camera size={36} className="sm:w-12 sm:h-12 mx-auto mb-4 opacity-50" />
+                <p className="text-base sm:text-xl" style={{ fontFamily: 'Inter, sans-serif' }}>{error}</p>
               </div>
             </div>
           )}
           
-          {/* Small Countdown in Center */}
+          {/* Countdown - Responsive Size */}
           {countdown > 0 && isCapturing && (
             <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-              <div className="bg-black/60 backdrop-blur-sm rounded-full w-32 h-32 flex items-center justify-center shadow-2xl border-4 border-white/30">
+              <div className="bg-black/60 backdrop-blur-sm rounded-full w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center shadow-2xl border-4 border-white/30">
                 <div 
-                  className="text-white text-6xl font-bold animate-pulse"
+                  className="text-white text-5xl sm:text-6xl font-bold animate-pulse"
                   style={{ fontFamily: 'Outfit, sans-serif' }}
                 >
                   {countdown}
@@ -220,59 +215,61 @@ function Camera({ layout, onComplete, onBack }) {
           {!cameraReady && !error && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-800 text-white z-20">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-pink-400 mx-auto mb-4"></div>
-                <p className="text-xl" style={{ fontFamily: 'Inter, sans-serif' }}>Loading camera...</p>
+                <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-4 border-pink-400 mx-auto mb-4"></div>
+                <p className="text-base sm:text-xl px-4" style={{ fontFamily: 'Inter, sans-serif' }}>Loading camera...</p>
               </div>
             </div>
           )}
         </div>
 
-        {/* Thumbnail Strip */}
+        {/* Thumbnail Strip - Horizontal Scroll on Mobile */}
         {photos.length > 0 && (
-          <div className="flex gap-3 mb-6 overflow-x-auto pb-2">
-            {photos.map((photo, idx) => (
-              <div key={idx} className="flex-shrink-0">
-                <img
-                  src={photo}
-                  alt={`Captured ${idx + 1}`}
-                  className="w-24 h-24 object-cover rounded-lg border-2 border-pink-300 shadow-md"
-                />
-              </div>
-            ))}
-            {Array.from({ length: layout.slots - photos.length }).map((_, idx) => (
-              <div
-                key={`empty-${idx}`}
-                className="w-24 h-24 bg-pink-50 rounded-lg border-2 border-dashed border-pink-300 flex items-center justify-center flex-shrink-0"
-              >
-                <CameraIcon className="text-pink-300" size={24} />
-              </div>
-            ))}
+          <div className="mb-4 sm:mb-6">
+            <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2">
+              {photos.map((photo, idx) => (
+                <div key={idx} className="flex-shrink-0">
+                  <img
+                    src={photo}
+                    alt={`Captured ${idx + 1}`}
+                    className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg border-2 border-pink-300 shadow-md"
+                  />
+                </div>
+              ))}
+              {Array.from({ length: layout.slots - photos.length }).map((_, idx) => (
+                <div
+                  key={`empty-${idx}`}
+                  className="w-20 h-20 sm:w-24 sm:h-24 bg-pink-50 rounded-lg border-2 border-dashed border-pink-300 flex items-center justify-center flex-shrink-0"
+                >
+                  <Camera className="text-pink-300" size={20} />
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Capture Button */}
+        {/* Capture Button - Full Width on Mobile */}
         <div className="space-y-3">
           <button
             onClick={startAutoCapture}
             disabled={isCapturing || !cameraReady || photos.length >= layout.slots}
-            className="w-full bg-gradient-to-r from-pink-400 to-rose-400 text-white py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+            className="w-full bg-gradient-to-r from-pink-400 to-rose-400 text-white py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 sm:gap-3"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
-            <CameraIcon size={24} />
-            {isCapturing ? 'Capturing Photos...' : photos.length >= layout.slots ? 'All Photos Captured' : 'Start Photo Session'}
+            <Camera size={20} />
+            <span className="text-sm sm:text-base">
+              {isCapturing ? 'Capturing...' : photos.length >= layout.slots ? 'All Captured' : 'Start Session'}
+            </span>
           </button>
 
-          {/* Edit & Continue Buttons */}
+          {/* Edit & Continue Button */}
           {showEditButton && (
-            <div className="flex gap-3">
-              <button
-                onClick={() => onComplete(photos)}
-                className="flex-1 bg-gradient-to-r from-green-400 to-emerald-400 text-white py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 flex items-center justify-center gap-2"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                Continue to Customize
-              </button>
-            </div>
+            <button
+              onClick={() => onComplete(photos)}
+              className="w-full bg-gradient-to-r from-green-400 to-emerald-400 text-white py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 flex items-center justify-center gap-2"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              Continue to Customize
+            </button>
           )}
         </div>
       </div>
@@ -282,4 +279,4 @@ function Camera({ layout, onComplete, onBack }) {
   );
 }
 
-export default Camera;
+export default CameraComponent;
