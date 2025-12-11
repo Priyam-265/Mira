@@ -6,7 +6,7 @@ import FiltersPanel from '../components/FiltersPanel';
 import StickerPanel from '../components/StickerPanel';
 import FrameCustomizer from '../components/FrameCustomizer';
 import PhotoEditor from '../components/PhotoEditor';
-import { Heart, Github, Edit2, Sparkles, Camera as CameraIcon ,Instagram} from 'lucide-react';
+import { Heart, Github, Edit2, Sparkles, Camera as CameraIcon, Instagram, Zap, Download, Star, Palette } from 'lucide-react';
 
 const LAYOUTS = [
   { id: 'layout-a', name: 'Classic', slots: 3, template: 'classic', description: '3 Photo Strip' },
@@ -33,6 +33,7 @@ function Booth() {
   const [editingPhotoIndex, setEditingPhotoIndex] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const finalCanvasRef = useRef(null);
+  const heroRef = useRef(null);
 
   // Load GSAP
   useEffect(() => {
@@ -47,6 +48,128 @@ function Booth() {
       }
     };
   }, []);
+
+  // Hero Animations
+  useEffect(() => {
+    if (step === 'home') {
+      // Wait for GSAP to load
+      const animateHome = () => {
+        if (typeof window !== 'undefined' && window.gsap) {
+          const gsap = window.gsap;
+          
+          // Animate hero title
+          gsap.fromTo('.hero-title',
+            { opacity: 0, y: 50, scale: 0.9 },
+            { opacity: 1, y: 0, scale: 1, duration: 1, ease: 'power4.out', delay: 0.2 }
+          );
+
+          // Animate subtitle
+          gsap.fromTo('.hero-subtitle',
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.5 }
+          );
+
+          // Animate CTA button
+          gsap.fromTo('.hero-cta',
+            { opacity: 0, scale: 0.8, y: 20 },
+            { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: 'back.out(1.7)', delay: 0.8 }
+          );
+
+          // Animate floating elements
+          gsap.to('.float-1', {
+            y: -20,
+            rotation: 5,
+            duration: 2,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut'
+          });
+
+          gsap.to('.float-2', {
+            y: -15,
+            rotation: -5,
+            duration: 2.5,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut',
+            delay: 0.5
+          });
+
+          gsap.to('.float-3', {
+            y: -25,
+            rotation: 8,
+            duration: 3,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut',
+            delay: 1
+          });
+
+          // Animate decorative hearts and stars
+          gsap.to('.float-heart', {
+            y: -30,
+            rotation: 15,
+            duration: 3.5,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut',
+            stagger: 0.3
+          });
+
+          gsap.to('.float-star', {
+            y: -20,
+            rotation: -10,
+            scale: 1.1,
+            duration: 2.8,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut',
+            stagger: 0.4
+          });
+
+          // Animate stats counter with fallback
+          const counters = document.querySelectorAll('.counter-number');
+          counters.forEach((counter) => {
+            const target = parseInt(counter.getAttribute('data-target') || '0');
+            if (target > 0) {
+              gsap.fromTo(counter, 
+                { textContent: 0 },
+                {
+                  textContent: target,
+                  duration: 2,
+                  delay: 1,
+                  ease: 'power2.out',
+                  snap: { textContent: 1 },
+                  onUpdate: function() {
+                    counter.textContent = Math.ceil(counter.textContent);
+                  }
+                }
+              );
+            }
+          });
+
+          // Animate feature cards
+          gsap.fromTo('.feature-card',
+            { opacity: 0, y: 50, scale: 0.9 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.15, ease: 'back.out(1.2)', delay: 1.2 }
+          );
+
+          // Continuous shimmer effect
+          gsap.to('.shimmer', {
+            x: '200%',
+            duration: 2,
+            repeat: -1,
+            ease: 'power1.inOut',
+            delay: 2
+          });
+        }
+      };
+
+      // Try immediately, then retry after delay
+      setTimeout(animateHome, 100);
+      setTimeout(animateHome, 500);
+    }
+  }, [step]);
 
   // Hamburger Animation
   useEffect(() => {
@@ -217,23 +340,23 @@ function Booth() {
                 About
               </Link>
               <Link 
-              to="/contact"
+                to="/contact"
                 onClick={() => setMobileMenuOpen(false)}
                 className="mobile-menu-item block w-full text-left text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 Contact
               </Link>
-             <a 
-                             href="https://www.instagram.com/mira.capturemoments?igsh=ZGEwbXVvdG54aHVw" 
-                             target="_blank" 
-                             rel="noopener noreferrer"
-                             className="mobile-menu-item flex items-center gap-2 text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
-                             style={{ fontFamily: 'Inter, sans-serif' }}
-                           >
-                             <Instagram size={20} />
-                             <span>Instagram</span>
-                           </a>
+              <a 
+                href="https://www.instagram.com/mira.capturemoments?igsh=ZGEwbXVvdG54aHVw" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="mobile-menu-item flex items-center gap-2 text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                <Instagram size={20} />
+                <span>Instagram</span>
+              </a>
             </div>
           </div>
         )}
@@ -242,73 +365,248 @@ function Booth() {
       <div className="max-w-7xl mx-auto p-4 pb-12">
         {/* Enhanced Home Page */}
         {step === 'home' && (
-          <div className="max-w-5xl mx-auto text-center space-y-10 py-8 sm:py-16">
-            <div className="space-y-4 sm:space-y-6 animate-on-mount px-4">
-              <h1 
-                className="text-4xl sm:text-5xl md:text-7xl font-bold text-gray-800 leading-tight"
-                style={{ fontFamily: 'Outfit, sans-serif', letterSpacing: '-2px' }}
-              >
-                Create Beautiful
-                <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-500 to-purple-500">
-                  Memories
-                </span>
-              </h1>
-              <p className="text-gray-600 text-base sm:text-lg md:text-xl max-w-2xl mx-auto px-4" style={{ fontFamily: 'Inter, sans-serif' }}>
-                Professional photo booth experience with customizable filters, frames, and stickers. 
-                Capture your moments in style.
-              </p>
+          <div className="max-w-6xl mx-auto">
+            {/* Hero Section */}
+            <div ref={heroRef} className="relative text-center space-y-8 py-8 sm:py-16 px-4 overflow-hidden">
+              {/* Floating decorative elements */}
+              <div className="absolute top-10 left-10 w-20 h-20 bg-pink-200 rounded-full blur-3xl opacity-60 float-1"></div>
+              <div className="absolute top-40 right-20 w-32 h-32 bg-purple-200 rounded-full blur-3xl opacity-60 float-2"></div>
+              <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-rose-200 rounded-full blur-3xl opacity-60 float-3"></div>
+
+              {/* Floating Hearts */}
+              <div className="absolute top-20 left-5 text-4xl sm:text-6xl float-heart opacity-30">💕</div>
+              <div className="absolute top-40 right-10 text-3xl sm:text-5xl float-heart opacity-25">❤️</div>
+              <div className="absolute bottom-32 left-12 text-3xl sm:text-5xl float-heart opacity-20">💖</div>
+              <div className="absolute bottom-48 right-16 text-4xl sm:text-6xl float-heart opacity-30">💗</div>
+              <div className="absolute top-72 left-1/4 text-3xl sm:text-5xl float-heart opacity-25 hidden sm:block">💝</div>
+              
+              {/* Floating Stars */}
+              <div className="absolute top-16 right-1/4 text-3xl sm:text-5xl float-star opacity-40">⭐</div>
+              <div className="absolute bottom-40 right-8 text-2xl sm:text-4xl float-star opacity-35">✨</div>
+              <div className="absolute top-80 right-20 text-3xl sm:text-5xl float-star opacity-30 hidden sm:block">🌟</div>
+              <div className="absolute bottom-64 left-20 text-2xl sm:text-4xl float-star opacity-35">💫</div>
+              <div className="absolute top-56 left-1/3 text-3xl sm:text-5xl float-star opacity-30 hidden md:block">⭐</div>
+
+              {/* Camera Icons */}
+              <div className="absolute top-32 left-1/4 text-3xl sm:text-4xl float-star opacity-20 hidden lg:block">📸</div>
+              <div className="absolute bottom-56 right-1/4 text-3xl sm:text-4xl float-heart opacity-20 hidden lg:block">📷</div>
+
+              {/* Main Hero Content */}
+              <div className="relative z-10">
+                <div className="inline-block mb-4">
+                  <div className="bg-gradient-to-r from-pink-100 to-rose-100 px-4 py-2 rounded-full border-2 border-pink-200 shadow-lg">
+                    <span className="text-pink-600 font-bold text-sm flex items-center gap-2" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      <Sparkles size={16} className="animate-pulse" />
+                      Online Photo Booth
+                      <Sparkles size={16} className="animate-pulse" />
+                    </span>
+                  </div>
+                </div>
+
+                <h1 
+                  className="hero-title text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold text-gray-900 leading-tight mb-6"
+                  style={{ fontFamily: 'Outfit, sans-serif', letterSpacing: '-2px' }}
+                >
+                  Capture Your
+                  <br />
+                  <span className="relative inline-block">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-500 to-purple-500">
+                      Best Moments
+                    </span>
+                    <div className="absolute inset-0 overflow-hidden">
+                      <div className="shimmer absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12"></div>
+                    </div>
+                  </span>
+                </h1>
+
+                <p className="hero-subtitle text-gray-600 text-base sm:text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Professional photo booth experience right in your browser. 
+                  <span className="hidden sm:inline"><br /></span>
+                  Create stunning photo strips with <span className="font-bold text-pink-600">14+ filters</span>, 
+                  <span className="font-bold text-purple-600"> 6 layouts</span>, and 
+                  <span className="font-bold text-rose-600"> unlimited creativity</span>. 
+                  No download required! ✨
+                </p>
+
+                {/* CTA Button with hover effects */}
+                <div className="hero-cta flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+                  <button
+                    onClick={() => setStep('layout')}
+                    className="group relative bg-gradient-to-r from-pink-500 via-rose-500 to-purple-500 text-white px-8 sm:px-12 py-4 sm:py-5 rounded-2xl text-lg sm:text-xl font-bold shadow-2xl hover:shadow-pink-300/50 transition-all hover:scale-110 inline-flex items-center gap-3 overflow-hidden"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-rose-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <span className="relative z-10">Start Creating Now</span>
+                    <Zap size={24} className="relative z-10 group-hover:rotate-12 transition-transform" />
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      document.querySelector('.features-section')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="text-pink-600 hover:text-pink-700 font-semibold px-6 py-4 rounded-xl hover:bg-pink-50 transition-all text-base sm:text-lg"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    See How It Works →
+                  </button>
+                </div>
+
+                {/* Social Proof Stats */}
+                <div className="mt-12 grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto">
+                  <div className="text-center">
+                    <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-pink-600 counter-number" data-target="500" style={{ fontFamily: 'Outfit, sans-serif' }}>500</div>
+                    <div className="text-xs sm:text-sm text-gray-600 mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>Photos Created</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-purple-600 counter-number" data-target="14" style={{ fontFamily: 'Outfit, sans-serif' }}>14</div>
+                    <div className="text-xs sm:text-sm text-gray-600 mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>Pro Filters</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-rose-600 counter-number" data-target="6" style={{ fontFamily: 'Outfit, sans-serif' }}>6</div>
+                    <div className="text-xs sm:text-sm text-gray-600 mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>Layouts</div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Feature Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto animate-on-mount px-4">
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-xl transition-all hover:scale-105 border border-pink-100">
-                <div className="bg-gradient-to-br from-pink-100 to-rose-100 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                  <CameraIcon className="text-pink-500" size={24} />
+            {/* Features Section */}
+            <div className="features-section grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-12 sm:mt-20 px-4">
+              <div className="feature-card group bg-white/90 backdrop-blur-sm rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all hover:scale-105 border border-pink-100 cursor-pointer">
+                <div className="bg-gradient-to-br from-pink-100 to-rose-100 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:rotate-6 transition-transform">
+                  <CameraIcon className="text-pink-500" size={28} />
                 </div>
                 <h3 className="font-bold text-gray-800 text-base sm:text-lg mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                  6 Layouts
+                  6 Unique Layouts
                 </h3>
-                <p className="text-gray-600 text-xs sm:text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  From classic strips to heart-shaped frames
+                <p className="text-gray-600 text-xs sm:text-sm leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Classic strips, heart frames, grids & more. Perfect for every occasion! 📸
                 </p>
               </div>
 
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-xl transition-all hover:scale-105 border border-pink-100">
-                <div className="bg-gradient-to-br from-purple-100 to-pink-100 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                  <Sparkles className="text-purple-500" size={24} />
+              <div className="feature-card group bg-white/90 backdrop-blur-sm rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all hover:scale-105 border border-purple-100 cursor-pointer">
+                <div className="bg-gradient-to-br from-purple-100 to-pink-100 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:rotate-6 transition-transform">
+                  <Sparkles className="text-purple-500" size={28} />
                 </div>
                 <h3 className="font-bold text-gray-800 text-base sm:text-lg mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                  14+ Filters
+                  14+ Pro Filters
                 </h3>
-                <p className="text-gray-600 text-xs sm:text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  Professional-grade photo filters
+                <p className="text-gray-600 text-xs sm:text-sm leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Vintage, warm, cool, B&W and more. Instagram-worthy in seconds! ✨
                 </p>
               </div>
 
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-xl transition-all hover:scale-105 border border-pink-100">
-                <div className="bg-gradient-to-br from-rose-100 to-pink-100 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                  <Heart className="text-rose-500 fill-rose-500" size={24} />
+              <div className="feature-card group bg-white/90 backdrop-blur-sm rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all hover:scale-105 border border-rose-100 cursor-pointer">
+                <div className="bg-gradient-to-br from-rose-100 to-pink-100 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:rotate-6 transition-transform">
+                  <Palette className="text-rose-500" size={28} />
                 </div>
                 <h3 className="font-bold text-gray-800 text-base sm:text-lg mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
                   Custom Frames
                 </h3>
-                <p className="text-gray-600 text-xs sm:text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  9 colors & 9 pattern options
+                <p className="text-gray-600 text-xs sm:text-sm leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  9 colors & 9 patterns. Make it uniquely yours with hearts, stars & more! 🎨
+                </p>
+              </div>
+
+              <div className="feature-card group bg-white/90 backdrop-blur-sm rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all hover:scale-105 border border-indigo-100 cursor-pointer">
+                <div className="bg-gradient-to-br from-indigo-100 to-purple-100 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:rotate-6 transition-transform">
+                  <Download className="text-indigo-500" size={28} />
+                </div>
+                <h3 className="font-bold text-gray-800 text-base sm:text-lg mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                  Instant Download
+                </h3>
+                <p className="text-gray-600 text-xs sm:text-sm leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  High-quality PNG export. Share on social media instantly! 💾
                 </p>
               </div>
             </div>
 
-            <button
-              onClick={() => setStep('layout')}
-              className="bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500 text-white px-8 sm:px-12 py-3 sm:py-4 rounded-xl text-base sm:text-xl font-bold shadow-2xl hover:shadow-pink-300/50 transition-all hover:scale-110 inline-flex items-center gap-3 animate-on-mount"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
-              <span>Get Started</span>
-              <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+            {/* How It Works Section */}
+            <div className="mt-16 sm:mt-24 px-4">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-4 text-gray-800" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                How It Works
+              </h2>
+              <p className="text-center text-gray-600 text-base sm:text-lg mb-12 max-w-2xl mx-auto" style={{ fontFamily: 'Inter, sans-serif' }}>
+                Create professional photo strips in just 3 simple steps
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
+                <div className="relative text-center p-6 sm:p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-pink-100 hover:shadow-xl transition-all">
+                  <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                    1
+                  </div>
+                  <div className="mt-8">
+                    <CameraIcon className="w-16 h-16 mx-auto mb-4 text-pink-500" />
+                    <h3 className="font-bold text-lg sm:text-xl mb-2 text-gray-800" style={{ fontFamily: 'Outfit, sans-serif' }}>Choose & Capture</h3>
+                    <p className="text-gray-600 text-sm sm:text-base" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      Select your favorite layout and snap your photos
+                    </p>
+                  </div>
+                </div>
+
+                <div className="relative text-center p-6 sm:p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-purple-100 hover:shadow-xl transition-all">
+                  <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                    2
+                  </div>
+                  <div className="mt-8">
+                    <Sparkles className="w-16 h-16 mx-auto mb-4 text-purple-500" />
+                    <h3 className="font-bold text-lg sm:text-xl mb-2 text-gray-800" style={{ fontFamily: 'Outfit, sans-serif' }}>Customize</h3>
+                    <p className="text-gray-600 text-sm sm:text-base" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      Apply filters, frames, stickers and make it perfect
+                    </p>
+                  </div>
+                </div>
+
+                <div className="relative text-center p-6 sm:p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-rose-100 hover:shadow-xl transition-all">
+                  <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                    3
+                  </div>
+                  <div className="mt-8">
+                    <Download className="w-16 h-16 mx-auto mb-4 text-rose-500" />
+                    <h3 className="font-bold text-lg sm:text-xl mb-2 text-gray-800" style={{ fontFamily: 'Outfit, sans-serif' }}>Download & Share</h3>
+                    <p className="text-gray-600 text-sm sm:text-base" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      Download high-quality images and share with friends
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonials / Reviews */}
+            <div className="mt-16 sm:mt-24 px-4">
+              <div className="bg-gradient-to-r from-pink-50 via-purple-50 to-rose-50 rounded-3xl p-8 sm:p-12 border-2 border-pink-200 shadow-xl">
+                <div className="text-center mb-8">
+                  <div className="flex justify-center gap-1 mb-3">
+                    {[1,2,3,4,5].map(i => <Star key={i} className="w-6 h-6 fill-yellow-400 text-yellow-400" />)}
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                    Loved by thousands
+                  </h3>
+                  <p className="text-gray-600 text-sm sm:text-base" style={{ fontFamily: 'Inter, sans-serif' }}>
+                    Join happy users creating amazing photo booth memories
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Final CTA */}
+            <div className="mt-16 sm:mt-20 text-center px-4">
+              <div className="bg-gradient-to-r from-pink-500 via-rose-500 to-purple-500 rounded-3xl p-8 sm:p-12 shadow-2xl">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                  Ready to Create Magic? ✨
+                </h2>
+                <p className="text-white/90 text-base sm:text-lg mb-8 max-w-2xl mx-auto" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Start creating beautiful photo booth memories now. Completely free, no signup required!
+                </p>
+                <button
+                  onClick={() => setStep('layout')}
+                  className="bg-white text-pink-600 px-8 sm:px-12 py-4 sm:py-5 rounded-2xl text-lg sm:text-xl font-bold shadow-xl hover:shadow-2xl hover:scale-110 transition-all inline-flex items-center gap-3"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  <span>Start Creating Free</span>
+                  <Zap size={24} />
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -439,7 +737,12 @@ function Booth() {
       </div>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+        
+        @keyframes shimmer {
+          0% { transform: translateX(-100%) skewX(-12deg); }
+          100% { transform: translateX(200%) skewX(-12deg); }
+        }
       `}</style>
     </div>
   );
