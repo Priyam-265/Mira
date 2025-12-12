@@ -201,14 +201,14 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
     return null;
   };
 
-  const handlePointerDown = (e) => {
+ const handlePointerDown = (e) => {
     if (!cropMode) return;
-    e.preventDefault();
     
     const coords = getEventCoordinates(e);
     const handle = getHandleAtPosition(coords.x, coords.y);
     
     if (handle) {
+      e.preventDefault();
       setIsDragging(true);
       setActiveHandle(handle);
       setDragStart(coords);
