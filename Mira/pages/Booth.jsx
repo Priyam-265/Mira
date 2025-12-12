@@ -904,7 +904,7 @@ function Booth() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const finalCanvasRef = useRef(null);
   // const heroRef = useRef(null);
-
+  
   // Save state to sessionStorage whenever it changes
   useEffect(() => {
     sessionStorage.setItem('photoBoothStep', step);
@@ -1126,38 +1126,55 @@ function Booth() {
     }
   }, [step]);
 
-  const handleLayoutSelect = (layout) => {
-    setSelectedLayout(layout);
-    setPhotos([]);
-    setStep('camera');
-  };
+  // Add this new function after your state declarations
+const resetCustomizations = () => {
+  setCurrentFilter('none');
+  setFrameColor({ 
+    id: 'gradient-pink', 
+    name: 'Pink Gradient', 
+    bg: 'linear-gradient(135deg, #fce7f3, #f9a8d4)', 
+    border: '#f472b6' 
+  });
+  setFramePattern({ id: 'none', name: 'No Pattern', emoji: '⬜', color: 'rgba(0, 0, 0, 0.4)' });
+  setStickers([]);
+  
+  sessionStorage.removeItem('photoBoothFilter');
+  sessionStorage.removeItem('photoBoothFrameColor');
+  sessionStorage.removeItem('photoBoothFramePattern');
+  sessionStorage.removeItem('photoBoothStickers');
+};
 
-  const handlePhotosCaptured = (capturedPhotos) => {
-    setPhotos(capturedPhotos);
-    setStep('customize');
-  };
+const handleLayoutSelect = (layout) => {
+  setSelectedLayout(layout);
+  setPhotos([]);
+  resetCustomizations();
+  setStep('camera');
+};
 
-  const handleReset = () => {
-    setPhotos([]);
-    setStickers([]);
-    setCurrentFilter('none');
-    setFrameColor({ id: 'gradient-pink', name: 'Pink Gradient', bg: 'linear-gradient(135deg, #fce7f3, #f9a8d4)', border: '#f472b6' });
-    setFramePattern({ id: 'none', name: 'No Pattern', emoji: '⬜', color: 'rgba(0, 0, 0, 0.4)' });
-    setSelectedLayout(null);
-    setStep('home');
-    // Clear sessionStorage
-    sessionStorage.removeItem('photoBoothStep');
-    sessionStorage.removeItem('photoBoothLayout');
-    sessionStorage.removeItem('photoBoothPhotos');
-    sessionStorage.removeItem('photoBoothFilter');
-    sessionStorage.removeItem('photoBoothFrameColor');
-    sessionStorage.removeItem('photoBoothFramePattern');
-    sessionStorage.removeItem('photoBoothStickers');
-  };
+const handlePhotosCaptured = (capturedPhotos) => {
+  setPhotos(capturedPhotos);
+  resetCustomizations();
+  setStep('customize');
+};
 
-  const handleBackToCamera = () => {
-    setStep('camera');
-  };
+const handleReset = () => {
+  setPhotos([]);
+  resetCustomizations();
+  setSelectedLayout(null);
+  setStep('home');
+  
+  sessionStorage.removeItem('photoBoothStep');
+  sessionStorage.removeItem('photoBoothLayout');
+  sessionStorage.removeItem('photoBoothPhotos');
+};
+
+const handleBackToCamera = () => {
+  resetCustomizations();
+  setPhotos([]);
+  sessionStorage.removeItem('photoBoothPhotos');
+  setStep('camera');
+};
+
 
   const addSticker = (emoji) => {
     setStickers([...stickers, {

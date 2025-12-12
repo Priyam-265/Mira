@@ -12,6 +12,7 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
   const [cropArea, setCropArea] = useState({ x: 10, y: 10, width: 80, height: 80 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [activeHandle, setActiveHandle] = useState(null); // 'move', 'tl', 'tr', 'bl', 'br', 'top', 'bottom', 'left', 'right'
   
   const canvasRef = useRef(null);
   const imageRef = useRef(null);
@@ -92,18 +93,54 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
         cropH
       );
       
+      // Draw border
       ctx.strokeStyle = '#f472b6';
       ctx.lineWidth = 3;
       ctx.setLineDash([10, 5]);
       ctx.strokeRect(cropX, cropY, cropW, cropH);
       ctx.setLineDash([]);
       
-      const handleSize = 12;
+      // Draw corner handles
+      const handleSize = 16;
       ctx.fillStyle = '#f472b6';
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      
+      // Top-left
       ctx.fillRect(cropX - handleSize/2, cropY - handleSize/2, handleSize, handleSize);
+      ctx.strokeRect(cropX - handleSize/2, cropY - handleSize/2, handleSize, handleSize);
+      
+      // Top-right
       ctx.fillRect(cropX + cropW - handleSize/2, cropY - handleSize/2, handleSize, handleSize);
+      ctx.strokeRect(cropX + cropW - handleSize/2, cropY - handleSize/2, handleSize, handleSize);
+      
+      // Bottom-left
       ctx.fillRect(cropX - handleSize/2, cropY + cropH - handleSize/2, handleSize, handleSize);
+      ctx.strokeRect(cropX - handleSize/2, cropY + cropH - handleSize/2, handleSize, handleSize);
+      
+      // Bottom-right
       ctx.fillRect(cropX + cropW - handleSize/2, cropY + cropH - handleSize/2, handleSize, handleSize);
+      ctx.strokeRect(cropX + cropW - handleSize/2, cropY + cropH - handleSize/2, handleSize, handleSize);
+      
+      // Draw edge handles (middle of each side)
+      const edgeHandleSize = 12;
+      ctx.fillStyle = '#f472b6';
+      
+      // Top
+      ctx.fillRect(cropX + cropW/2 - edgeHandleSize/2, cropY - edgeHandleSize/2, edgeHandleSize, edgeHandleSize);
+      ctx.strokeRect(cropX + cropW/2 - edgeHandleSize/2, cropY - edgeHandleSize/2, edgeHandleSize, edgeHandleSize);
+      
+      // Bottom
+      ctx.fillRect(cropX + cropW/2 - edgeHandleSize/2, cropY + cropH - edgeHandleSize/2, edgeHandleSize, edgeHandleSize);
+      ctx.strokeRect(cropX + cropW/2 - edgeHandleSize/2, cropY + cropH - edgeHandleSize/2, edgeHandleSize, edgeHandleSize);
+      
+      // Left
+      ctx.fillRect(cropX - edgeHandleSize/2, cropY + cropH/2 - edgeHandleSize/2, edgeHandleSize, edgeHandleSize);
+      ctx.strokeRect(cropX - edgeHandleSize/2, cropY + cropH/2 - edgeHandleSize/2, edgeHandleSize, edgeHandleSize);
+      
+      // Right
+      ctx.fillRect(cropX + cropW - edgeHandleSize/2, cropY + cropH/2 - edgeHandleSize/2, edgeHandleSize, edgeHandleSize);
+      ctx.strokeRect(cropX + cropW - edgeHandleSize/2, cropY + cropH/2 - edgeHandleSize/2, edgeHandleSize, edgeHandleSize);
     }
 
     ctx.filter = 'none';
@@ -128,34 +165,180 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
     return { x, y };
   };
 
+  const getHandleAtPosition = (x, y) => {
+    const canvas = canvasRef.current;
+    const img = imageRef.current;
+    if (!canvas || !img) return null;
+
+    const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+    const offsetX = (canvas.width - img.width * scale) / 2;
+    const offsetY = (canvas.height - img.height * scale) / 2;
+    const scaledWidth = img.width * scale;
+    const scaledHeight = img.height * scale;
+
+    const cropX = ((offsetX + (cropArea.x / 100) * scaledWidth) / canvas.width) * 100;
+    const cropY = ((offsetY + (cropArea.y / 100) * scaledHeight) / canvas.height) * 100;
+    const cropW = ((cropArea.width / 100) * scaledWidth / canvas.width) * 100;
+    const cropH = ((cropArea.height / 100) * scaledHeight / canvas.height) * 100;
+
+    const handleThreshold = 3;
+    
+    // Check corners first
+    if (Math.abs(x - cropX) < handleThreshold && Math.abs(y - cropY) < handleThreshold) return 'tl';
+    if (Math.abs(x - (cropX + cropW)) < handleThreshold && Math.abs(y - cropY) < handleThreshold) return 'tr';
+    if (Math.abs(x - cropX) < handleThreshold && Math.abs(y - (cropY + cropH)) < handleThreshold) return 'bl';
+    if (Math.abs(x - (cropX + cropW)) < handleThreshold && Math.abs(y - (cropY + cropH)) < handleThreshold) return 'br';
+    
+    // Check edges
+    if (Math.abs(x - (cropX + cropW/2)) < handleThreshold && Math.abs(y - cropY) < handleThreshold) return 'top';
+    if (Math.abs(x - (cropX + cropW/2)) < handleThreshold && Math.abs(y - (cropY + cropH)) < handleThreshold) return 'bottom';
+    if (Math.abs(x - cropX) < handleThreshold && Math.abs(y - (cropY + cropH/2)) < handleThreshold) return 'left';
+    if (Math.abs(x - (cropX + cropW)) < handleThreshold && Math.abs(y - (cropY + cropH/2)) < handleThreshold) return 'right';
+    
+    // Check if inside crop area (for moving)
+    if (x >= cropX && x <= cropX + cropW && y >= cropY && y <= cropY + cropH) return 'move';
+    
+    return null;
+  };
+
   const handlePointerDown = (e) => {
     if (!cropMode) return;
     e.preventDefault();
     
     const coords = getEventCoordinates(e);
-    setIsDragging(true);
-    setDragStart(coords);
+    const handle = getHandleAtPosition(coords.x, coords.y);
+    
+    if (handle) {
+      setIsDragging(true);
+      setActiveHandle(handle);
+      setDragStart(coords);
+    }
   };
 
   const handlePointerMove = (e) => {
-    if (!cropMode || !isDragging) return;
-    e.preventDefault();
+    if (!cropMode) return;
     
     const coords = getEventCoordinates(e);
+    
+    // Update cursor based on handle
+    if (!isDragging) {
+      const handle = getHandleAtPosition(coords.x, coords.y);
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      
+      if (handle === 'move') canvas.style.cursor = 'move';
+      else if (handle === 'tl' || handle === 'br') canvas.style.cursor = 'nwse-resize';
+      else if (handle === 'tr' || handle === 'bl') canvas.style.cursor = 'nesw-resize';
+      else if (handle === 'top' || handle === 'bottom') canvas.style.cursor = 'ns-resize';
+      else if (handle === 'left' || handle === 'right') canvas.style.cursor = 'ew-resize';
+      else canvas.style.cursor = 'default';
+      return;
+    }
+    
+    e.preventDefault();
+    
     const deltaX = coords.x - dragStart.x;
     const deltaY = coords.y - dragStart.y;
     
-    setCropArea(prev => ({
-      ...prev,
-      x: Math.max(0, Math.min(100 - prev.width, prev.x + deltaX)),
-      y: Math.max(0, Math.min(100 - prev.height, prev.y + deltaY))
-    }));
+    const minSize = 10; // Minimum crop size in percentage
+    
+    setCropArea(prev => {
+      let newArea = { ...prev };
+      
+      switch (activeHandle) {
+        case 'move':
+          newArea.x = Math.max(0, Math.min(100 - prev.width, prev.x + deltaX));
+          newArea.y = Math.max(0, Math.min(100 - prev.height, prev.y + deltaY));
+          break;
+          
+        case 'tl':
+          const newWidthTL = prev.width - deltaX;
+          const newHeightTL = prev.height - deltaY;
+          if (newWidthTL >= minSize && prev.x + deltaX >= 0) {
+            newArea.x = prev.x + deltaX;
+            newArea.width = newWidthTL;
+          }
+          if (newHeightTL >= minSize && prev.y + deltaY >= 0) {
+            newArea.y = prev.y + deltaY;
+            newArea.height = newHeightTL;
+          }
+          break;
+          
+        case 'tr':
+          const newWidthTR = prev.width + deltaX;
+          const newHeightTR = prev.height - deltaY;
+          if (newWidthTR >= minSize && prev.x + newWidthTR <= 100) {
+            newArea.width = newWidthTR;
+          }
+          if (newHeightTR >= minSize && prev.y + deltaY >= 0) {
+            newArea.y = prev.y + deltaY;
+            newArea.height = newHeightTR;
+          }
+          break;
+          
+        case 'bl':
+          const newWidthBL = prev.width - deltaX;
+          const newHeightBL = prev.height + deltaY;
+          if (newWidthBL >= minSize && prev.x + deltaX >= 0) {
+            newArea.x = prev.x + deltaX;
+            newArea.width = newWidthBL;
+          }
+          if (newHeightBL >= minSize && prev.y + newHeightBL <= 100) {
+            newArea.height = newHeightBL;
+          }
+          break;
+          
+        case 'br':
+          const newWidthBR = prev.width + deltaX;
+          const newHeightBR = prev.height + deltaY;
+          if (newWidthBR >= minSize && prev.x + newWidthBR <= 100) {
+            newArea.width = newWidthBR;
+          }
+          if (newHeightBR >= minSize && prev.y + newHeightBR <= 100) {
+            newArea.height = newHeightBR;
+          }
+          break;
+          
+        case 'top':
+          const newHeightTop = prev.height - deltaY;
+          if (newHeightTop >= minSize && prev.y + deltaY >= 0) {
+            newArea.y = prev.y + deltaY;
+            newArea.height = newHeightTop;
+          }
+          break;
+          
+        case 'bottom':
+          const newHeightBottom = prev.height + deltaY;
+          if (newHeightBottom >= minSize && prev.y + newHeightBottom <= 100) {
+            newArea.height = newHeightBottom;
+          }
+          break;
+          
+        case 'left':
+          const newWidthLeft = prev.width - deltaX;
+          if (newWidthLeft >= minSize && prev.x + deltaX >= 0) {
+            newArea.x = prev.x + deltaX;
+            newArea.width = newWidthLeft;
+          }
+          break;
+          
+        case 'right':
+          const newWidthRight = prev.width + deltaX;
+          if (newWidthRight >= minSize && prev.x + newWidthRight <= 100) {
+            newArea.width = newWidthRight;
+          }
+          break;
+      }
+      
+      return newArea;
+    });
     
     setDragStart(coords);
   };
 
   const handlePointerUp = () => {
     setIsDragging(false);
+    setActiveHandle(null);
   };
 
   const handleSave = () => {
@@ -233,7 +416,7 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
               <canvas
                 ref={canvasRef}
                 className="max-w-full max-h-full rounded-lg shadow-2xl touch-none"
-                style={{ cursor: cropMode ? 'move' : 'default' }}
+                style={{ cursor: 'default' }}
                 onMouseDown={handlePointerDown}
                 onMouseMove={handlePointerMove}
                 onMouseUp={handlePointerUp}
@@ -245,8 +428,8 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
               {cropMode && (
                 <div className="absolute top-2 left-2 bg-black/70 text-white px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm flex items-center gap-2">
                   <Move size={14} className="sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Drag to reposition crop area</span>
-                  <span className="sm:hidden">Drag to reposition</span>
+                  <span className="hidden sm:inline">Drag corners/edges to resize, center to move</span>
+                  <span className="sm:hidden">Resize or move crop</span>
                 </div>
               )}
             </div>
@@ -381,7 +564,9 @@ function PhotoEditor({ photo, index, onSave, onCancel }) {
                 <div className="bg-pink-50 border border-pink-200 rounded-lg p-3 sm:p-4">
                   <p className="text-xs sm:text-sm text-gray-700" style={{ fontFamily: 'Inter, sans-serif' }}>
                     <strong>How to crop:</strong><br/>
-                    Click and drag on the image to move the crop area. The selected area will be kept.
+                    • Drag corners to resize diagonally<br/>
+                    • Drag edges to resize horizontally/vertically<br/>
+                    • Drag center to move the crop area
                   </p>
                 </div>
               )}
