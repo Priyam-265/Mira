@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Github, Sparkles, Camera, Zap, Users, Award, Mail, Star, TrendingUp,Instagram } from 'lucide-react';
+import { Heart, Github, Sparkles, Camera, Zap, Users, Award, Mail, Star, TrendingUp,Instagram,Shield } from 'lucide-react';
 
 function About() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -502,6 +502,10 @@ function About() {
           <p className="text-gray-500 text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
             © 2025 Mira. All rights reserved.
           </p>
+            <Link to="/terms" className="text-gray-600 hover:text-pink-500 transition-colors font-medium flex items-center gap-2">
+  <Shield size={16} />
+  Privacy & Terms
+</Link>
         </div>
       </footer>
 
