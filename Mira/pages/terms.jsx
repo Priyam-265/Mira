@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Shield, FileText, Instagram, Home, Mail } from 'lucide-react';
-
+import { X, Shield, FileText, Instagram, Home, Mail,Heart } from 'lucide-react';
+import { Link } from 'react-router-dom'; 
 function LegalPages() {
   const [activePage, setActivePage] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -452,56 +452,68 @@ function LegalPages() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white/80 backdrop-blur-md border-t border-pink-200 py-8 px-4 mt-12">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-4 flex-wrap">
-            <a
-              href="/"
-              className="text-gray-600 hover:text-pink-500 transition-colors font-medium flex items-center gap-2"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
-              <Home size={16} />
-              <span>Home</span>
-            </a>
-            <span className="hidden sm:inline text-gray-400">•</span>
-            <a
-              href="/about"
-              className="text-gray-600 hover:text-pink-500 transition-colors font-medium"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
-              About
-            </a>
-            <span className="hidden sm:inline text-gray-400">•</span>
-            <a
-              href="/contact"
-              className="text-gray-600 hover:text-pink-500 transition-colors font-medium flex items-center gap-2"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
-              <Mail size={16} />
-              <span>Contact</span>
-            </a>
-            <span className="hidden sm:inline text-gray-400">•</span>
-            <button
-              onClick={() => setActivePage('privacy')}
-              className="text-gray-600 hover:text-pink-500 transition-colors font-medium flex items-center gap-2"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
-              <Shield size={16} />
-              <span>Privacy Policy</span>
-            </button>
-            <span className="hidden sm:inline text-gray-400">•</span>
-            <button
-              onClick={() => setActivePage('terms')}
-              className="text-gray-600 hover:text-pink-500 transition-colors font-medium flex items-center gap-2"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
-              <FileText size={16} />
-              <span>Terms & Conditions</span>
-            </button>
+      <footer className="bg-gradient-to-br from-pink-100 to-rose-100 py-12 px-4 border-t border-pink-200">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div>
+              <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-rose-500 mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                Mira
+              </h3>
+              <p className="text-gray-600 mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
+                Creating beautiful photo booth memories, one moment at a time.
+              </p>
+              <a 
+                href="https://www.instagram.com/mira.capturemoments?igsh=ZGEwbXVvdG54aHVw" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-pink-600 hover:text-pink-700 font-medium"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                <Instagram size={20} />
+                Follow us on Instagram
+              </a>
+            </div>
+
+            <div>
+              <h4 className="text-lg font-bold text-gray-800 mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                Quick Links
+              </h4>
+              <div className="space-y-2">
+                <Link to="/" className="block text-gray-600 hover:text-pink-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Home
+                </Link>
+                <Link to="/about" className="block text-gray-600 hover:text-pink-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  About
+                </Link>
+                <Link to="/contact" className="block text-gray-600 hover:text-pink-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Contact
+                </Link>
+                <Link to="/terms" className="block text-gray-600 hover:text-pink-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Terms and conditions and privacy policy 
+                </Link>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-lg font-bold text-gray-800 mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                Contact Us
+              </h4>
+              <div className="space-y-2 text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <div className="flex items-center gap-2">
+                  <Mail size={16} />
+                  <a href="mailto:hello@mira.com" className="hover:text-pink-600">
+                    mira.capturemoments@gmail.com
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
-          <p className="text-gray-500 text-sm text-center" style={{ fontFamily: 'Inter, sans-serif' }}>
-            © 2025 Mira. All rights reserved.
-          </p>
+
+          <div className="border-t border-pink-200 pt-8 text-center">
+            <p className="text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+              © 2025 Mira. All rights reserved. Made with <Heart className="inline text-pink-500 fill-pink-500" size={16} /> for creating memories.
+            </p>
+          </div>
         </div>
       </footer>
 

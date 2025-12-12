@@ -537,18 +537,70 @@ function Contact() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-white/80 backdrop-blur-md border-t border-pink-200 py-8 px-4">
-        <div className="max-w-7xl mx-auto text-center">
-          <p className="text-gray-500 text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-            © 2025 Mira. All rights reserved.
-          </p>
-          <Link to="/terms" className="text-gray-600 hover:text-pink-500 transition-colors font-medium flex items-center gap-2">
-  <Shield size={16} />
-  Privacy & Terms
-</Link>
-        </div>
-      </footer>
+     <footer className="bg-gradient-to-br from-pink-100 to-rose-100 py-12 px-4 border-t border-pink-200">
+             <div className="max-w-6xl mx-auto">
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                 <div>
+                   <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-rose-500 mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                     Mira
+                   </h3>
+                   <p className="text-gray-600 mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
+                     Creating beautiful photo booth memories, one moment at a time.
+                   </p>
+                   <a 
+                     href="https://www.instagram.com/mira.capturemoments?igsh=ZGEwbXVvdG54aHVw" 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="inline-flex items-center gap-2 text-pink-600 hover:text-pink-700 font-medium"
+                     style={{ fontFamily: 'Inter, sans-serif' }}
+                   >
+                     <Instagram size={20} />
+                     Follow us on Instagram
+                   </a>
+                 </div>
+     
+                 <div>
+                   <h4 className="text-lg font-bold text-gray-800 mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                     Quick Links
+                   </h4>
+                   <div className="space-y-2">
+                     <Link to="/" className="block text-gray-600 hover:text-pink-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+                       Home
+                     </Link>
+                     <Link to="/about" className="block text-gray-600 hover:text-pink-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+                       About
+                     </Link>
+                     <Link to="/contact" className="block text-gray-600 hover:text-pink-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+                       Contact
+                     </Link>
+                     <Link to="/terms" className="block text-gray-600 hover:text-pink-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+                       Terms and conditions and privacy policy 
+                     </Link>
+                   </div>
+                 </div>
+     
+                 <div>
+                   <h4 className="text-lg font-bold text-gray-800 mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                     Contact Us
+                   </h4>
+                   <div className="space-y-2 text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+                     <div className="flex items-center gap-2">
+                       <Mail size={16} />
+                       <a href="mailto:hello@mira.com" className="hover:text-pink-600">
+                         mira.capturemoments@gmail.com
+                       </a>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+     
+               <div className="border-t border-pink-200 pt-8 text-center">
+                 <p className="text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+                   © 2025 Mira. All rights reserved. Made with <Heart className="inline text-pink-500 fill-pink-500" size={16} /> for creating memories.
+                 </p>
+               </div>
+             </div>
+           </footer>
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
