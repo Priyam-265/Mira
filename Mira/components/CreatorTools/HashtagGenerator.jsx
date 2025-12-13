@@ -12,7 +12,7 @@ function HashtagGenerator() {
   const [usage, setUsage] = useState({ used: 0, remaining: 10, total: 10 });
   const [error, setError] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const API_URL=import.meta.env.VITE_API_URL||'http://localhost:5000';
   const heroRef = useRef(null);
   const formRef = useRef(null);
   const resultRef = useRef(null);
@@ -59,7 +59,7 @@ function HashtagGenerator() {
 
   const fetchUsage = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/creator/hashtag-usage');
+      const response = await fetch(`${API_URL}/api/creator/hashtag-usage`);
       const data = await response.json();
       if (data.success) {
         setUsage(data);

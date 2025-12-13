@@ -22,7 +22,7 @@ function ThumbnailGenerator() {
   const heroRef = useRef(null);
   const cardsRef = useRef(null);
   const loadingRef = useRef(null);
-
+  const API_URL=import.meta.env.VITE_API_URL||'http://localhost:5000';
   useEffect(() => {
     fetchUsage();
   }, []);
@@ -56,7 +56,7 @@ function ThumbnailGenerator() {
 
   const fetchUsage = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/creator/usage');
+      const response = await fetch(`${API_URL}/api/creator/usage`);
       const data = await response.json();
       if (data.success) {
         setUsage(data);
@@ -99,7 +99,7 @@ function ThumbnailGenerator() {
     setError('');
 
     try {
-const response = await fetch('/api/creator/generate', {
+const response = await fetch(`${API_URL}/api/creator/generate`, {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',

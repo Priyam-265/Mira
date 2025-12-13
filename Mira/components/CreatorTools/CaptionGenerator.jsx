@@ -12,7 +12,7 @@ function CaptionGenerator() {
   const [usage, setUsage] = useState({ used: 0, remaining: 10, total: 10 });
   const [error, setError] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const API_URL=import.meta.env.VITE_API_URL||'http://localhost:5000';
   const heroRef = useRef(null);
   const formRef = useRef(null);
   const resultRef = useRef(null);
@@ -57,10 +57,9 @@ function CaptionGenerator() {
       );
     }
   }, [generatedCaption]);
-
   const fetchUsage = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/creator/caption-usage');
+      const response = await fetch(`${API_URL}/api/creator/caption-usage`);
       const data = await response.json();
       if (data.success) {
         setUsage(data);
@@ -86,7 +85,7 @@ function CaptionGenerator() {
     setGeneratedCaption('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/creator/generate-caption', {
+      const response = await fetch(`${API_URL}/api/creator/generate-caption`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

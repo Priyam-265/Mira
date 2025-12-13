@@ -11,7 +11,7 @@ function BackgroundRemover() {
   const [usage, setUsage] = useState({ used: 0, remaining: 2, total: 2 });
   const [error, setError] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const API_URL=import.meta.env.VITE_API_URL||'http://localhost:5000';
   const heroRef = useRef(null);
   const uploadRef = useRef(null);
   const resultRef = useRef(null);
@@ -58,7 +58,7 @@ function BackgroundRemover() {
 
   const fetchUsage = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/creator/bg-removal-usage');
+      const response = await fetch(`${API_URL}/api/creator/bg-removal-usage`);
       const data = await response.json();
       if (data.success) {
         setUsage(data);
@@ -91,7 +91,7 @@ function BackgroundRemover() {
       reader.readAsDataURL(file);
     }
   };
-
+  
   const handleRemoveBackground = async () => {
     if (!uploadedImage) {
       setError('Please upload an image first');
@@ -111,7 +111,7 @@ function BackgroundRemover() {
       const formData = new FormData();
       formData.append('image', uploadedImage);
 
-      const response = await fetch('http://localhost:5000/api/creator/remove-background', {
+      const response = await fetch(`${API_URL}/api/creator/remove-background`, {
         method: 'POST',
         body: formData
       });
