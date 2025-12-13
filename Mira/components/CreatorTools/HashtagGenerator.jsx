@@ -85,7 +85,7 @@ function HashtagGenerator() {
     setGeneratedHashtags([]);
 
     try {
-      const response = await fetch('http://localhost:5000/api/creator/generate-hashtags', {
+      const response = await fetch(`${API_URL}/api/creator/generate-hashtags`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
