@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Sparkles, Camera, Zap, Award, Mail, Star, TrendingUp, Instagram, Shield } from 'lucide-react';
+import { Heart, Sparkles, Camera, Zap, Award, Mail, Star, TrendingUp, Instagram, Shield,CameraIcon,Palette,Download } from 'lucide-react';
 
 function About() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  
   useEffect(() => {
     // Load GSAP
     const script = document.createElement('script');
@@ -120,103 +120,120 @@ function About() {
     }}>
       {/* Navbar */}
       <nav className="bg-white/80 backdrop-blur-md shadow-lg border-b border-pink-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
-          <div className="flex items-center justify-between">
-            <Link 
-              to="/"
-              className="text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-rose-500"
-              style={{ fontFamily: 'Outfit, sans-serif', letterSpacing: '0.5px' }}
-            >
-              Mira
-            </Link>
-            
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-6">
-              <Link 
-                to="/"
-                className="text-base text-gray-700 hover:text-pink-600 font-medium transition-colors"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                Home
-              </Link>
-              <Link 
-                to="/about"
-                className="text-base text-pink-600 font-medium"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                About
-              </Link>
-              <Link 
-                to="/contact" 
-                className="text-base text-gray-700 hover:text-pink-600 font-medium transition-colors"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                Contact
-              </Link>
-              <a 
-                href="https://www.instagram.com/mira.capturemoments?igsh=ZGEwbXVvdG54aHVw" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-700 hover:text-pink-600 transition-colors"
-              >
-                <Instagram size={20} />
-              </a>
-            </div>
-
-            {/* Mobile Hamburger */}
-            <button 
-              className="md:hidden relative w-8 h-8 flex flex-col items-center justify-center gap-1.5"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              <span className="hamburger-line-1 w-6 h-0.5 bg-gray-700 rounded-full block origin-center"></span>
-              <span className="hamburger-line-2 w-6 h-0.5 bg-gray-700 rounded-full block origin-center"></span>
-              <span className="hamburger-line-3 w-6 h-0.5 bg-gray-700 rounded-full block origin-center"></span>
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="mobile-menu-container md:hidden bg-white/95 backdrop-blur-md border-t border-pink-200 shadow-lg overflow-hidden">
-            <div className="px-4 py-3 space-y-1">
-              <Link 
-                to="/"
-                onClick={() => setMobileMenuOpen(false)}
-                className="mobile-menu-item block w-full text-left text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                Home
-              </Link>
-              <Link 
-                to="/about"
-                onClick={() => setMobileMenuOpen(false)}
-                className="mobile-menu-item block w-full text-left text-pink-600 bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                About
-              </Link>
-              <Link 
-                to="/contact"
-                onClick={() => setMobileMenuOpen(false)}
-                className="mobile-menu-item block w-full text-left text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                Contact
-              </Link>
-              <a 
-                href="https://www.instagram.com/mira.capturemoments?igsh=ZGEwbXVvdG54aHVw" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="mobile-menu-item flex items-center gap-2 text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                <Instagram size={20} />
-                <span>Instagram</span>
-              </a>
-            </div>
-          </div>
-        )}
-      </nav>
+                   <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+                     <div className="flex items-center justify-between">
+                       <Link 
+                         to="/"
+                         className="text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-rose-500 cursor-pointer"
+                         style={{ fontFamily: 'Outfit, sans-serif', letterSpacing: '0.5px' }}
+                       >
+                         Mira
+                       </Link>
+                       
+                       {/* Desktop Navigation */}
+                       <div className="hidden md:flex items-center gap-6">
+                         <Link 
+                           to="/"
+                           className="text-base text-gray-700 hover:text-pink-600 font-medium transition-colors"
+                           style={{ fontFamily: 'Inter, sans-serif' }}
+                         >
+                           Home
+                         </Link>
+                         <Link 
+                           to="/creatortools"
+                           className="text-base text-gray-700 hover:text-pink-600 font-medium transition-colors"
+                           style={{ fontFamily: 'Inter, sans-serif' }}
+                         >
+                           Creator Tools
+                         </Link>
+                         <Link 
+                           to="/about"
+                           className="text-base text-gray-700 hover:text-pink-600 font-medium transition-colors"
+                           style={{ fontFamily: 'Inter, sans-serif' }}
+                         >
+                           About
+                         </Link>
+                         <Link
+                           to='/contact'
+                           className="text-base text-gray-700 hover:text-pink-600 font-medium transition-colors"
+                           style={{ fontFamily: 'Inter, sans-serif' }}
+                         >
+                           Contact
+                         </Link>
+                         <a 
+                           href="https://www.instagram.com/mira.capturemoments?igsh=ZGEwbXVvdG54aHVw" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           className="text-gray-700 hover:text-pink-600 transition-colors"
+                         >
+                           <Instagram size={20} />
+                         </a>
+                       </div>
+           
+                       {/* Mobile Hamburger */}
+                       <button 
+                         className="md:hidden relative w-8 h-8 flex flex-col items-center justify-center gap-1.5"
+                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                       >
+                         <span className="hamburger-line-1 w-6 h-0.5 bg-gray-700 rounded-full block origin-center"></span>
+                         <span className="hamburger-line-2 w-6 h-0.5 bg-gray-700 rounded-full block origin-center"></span>
+                         <span className="hamburger-line-3 w-6 h-0.5 bg-gray-700 rounded-full block origin-center"></span>
+                       </button>
+                     </div>
+                   </div>
+           
+                   {/* Mobile Menu */}
+                   {mobileMenuOpen && (
+                     <div className="mobile-menu-container md:hidden bg-white/95 backdrop-blur-md border-t border-pink-200 shadow-lg overflow-hidden">
+                       <div className="px-4 py-3 space-y-1">
+                         <button 
+                           onClick={() => {
+                             setStep('home');
+                             setMobileMenuOpen(false);
+                           }}
+                           className="mobile-menu-item block w-full text-left text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
+                           style={{ fontFamily: 'Inter, sans-serif' }}
+                         >
+                           Home
+                         </button>
+                         <Link 
+                           to="/about"
+                           onClick={() => setMobileMenuOpen(false)}
+                           className="mobile-menu-item block w-full text-left text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
+                           style={{ fontFamily: 'Inter, sans-serif' }}
+                         >
+                           About
+                         </Link>
+                         <Link 
+                           to="/creatortools"
+                           onClick={() => setMobileMenuOpen(false)}
+                           className="mobile-menu-item block w-full text-left text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
+                           style={{ fontFamily: 'Inter, sans-serif' }}
+                         >
+                           Creator Tools
+                         </Link>
+                         <Link 
+                           to="/contact"
+                           onClick={() => setMobileMenuOpen(false)}
+                           className="mobile-menu-item block w-full text-left text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
+                           style={{ fontFamily: 'Inter, sans-serif' }}
+                         >
+                           Contact
+                         </Link>
+                         <a 
+                           href="https://www.instagram.com/mira.capturemoments?igsh=ZGEwbXVvdG54aHVw" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           className="mobile-menu-item flex items-center gap-2 text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
+                           style={{ fontFamily: 'Inter, sans-serif' }}
+                         >
+                           <Instagram size={20} />
+                           <span>Instagram</span>
+                         </a>
+                       </div>
+                     </div>
+                   )}
+                 </nav>
 
       {/* Hero Section */}
       <section className="relative py-20 px-4 overflow-hidden">
@@ -253,7 +270,106 @@ function About() {
           </div>
         </div>
       </section>
+      {/* NEW: Creator Tools Banner - Strategic placement after hero */}
+            <div className="mt-12 sm:mt-16 px-4">
+              <Link to="/creatortools">
+                <div className="relative bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 rounded-3xl p-8 sm:p-12 shadow-2xl hover:shadow-purple-300/50 transition-all hover:scale-[1.02] cursor-pointer overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-rose-500 via-pink-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  
+                  {/* Floating elements */}
+                  <div className="absolute top-4 right-4 text-3xl sm:text-4xl opacity-30 group-hover:scale-110 transition-transform">✨</div>
+                  <div className="absolute bottom-4 left-4 text-3xl sm:text-4xl opacity-30 group-hover:scale-110 transition-transform">🎨</div>
+                  <div className="absolute top-1/2 right-1/4 text-2xl sm:text-3xl opacity-20 hidden sm:block">🚀</div>
+                  
+                  <div className="relative z-10 text-center">
+                    <div className="inline-block mb-3">
+                      <span className="bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-white text-xs sm:text-sm font-bold border border-white/30">
+                        ✨ NEW FEATURE
+                      </span>
+                    </div>
+                    
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-3 sm:mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                      AI-Powered Creator Tools
+                    </h2>
+                    
+                    <p className="text-white/95 text-base sm:text-lg md:text-xl max-w-3xl mx-auto mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      Take your content to the next level! Generate captions, remove backgrounds, create hashtags, and more with our professional AI tools.
+                    </p>
+                    
+                    <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-6">
+                      <div className="flex items-center gap-2 text-white/90 text-sm sm:text-base" style={{ fontFamily: 'Inter, sans-serif' }}>
+                        <Sparkles size={18} className="flex-shrink-0" />
+                        <span>AI Caption Generator</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-white/90 text-sm sm:text-base" style={{ fontFamily: 'Inter, sans-serif' }}>
+                        <TrendingUp size={18} className="flex-shrink-0" />
+                        <span>Hashtag Generator</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-white/90 text-sm sm:text-base" style={{ fontFamily: 'Inter, sans-serif' }}>
+                        <CameraIcon size={18} className="flex-shrink-0" />
+                        <span>Background Remover</span>
+                      </div>
+                    </div>
+                    
+                    <button className="bg-white text-purple-600 px-6 sm:px-10 py-3 sm:py-4 rounded-xl text-base sm:text-lg font-bold shadow-xl hover:shadow-2xl hover:scale-110 transition-all inline-flex items-center gap-2 sm:gap-3 group-hover:bg-yellow-50" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      <span>Explore Creator Tools</span>
+                      <Zap size={20} className="group-hover:rotate-12 transition-transform" />
+                    </button>
+                  </div>
+                </div>
+              </Link>
+            </div>
 
+            {/* Features Section */}
+            {/* <div className="features-section grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-12 sm:mt-20 px-4">
+              <div className="feature-card group bg-white/90 backdrop-blur-sm rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all hover:scale-105 border border-pink-100 cursor-pointer">
+                <div className="bg-gradient-to-br from-pink-100 to-rose-100 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:rotate-6 transition-transform">
+                  <CameraIcon className="text-pink-500" size={28} />
+                </div>
+                <h3 className="font-bold text-gray-800 text-base sm:text-lg mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                  6 Unique Layouts
+                </h3>
+                <p className="text-gray-600 text-xs sm:text-sm leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Classic strips, heart frames, grids & more. Perfect for every occasion! 📸
+                </p>
+              </div>
+
+              <div className="feature-card group bg-white/90 backdrop-blur-sm rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all hover:scale-105 border border-purple-100 cursor-pointer">
+                <div className="bg-gradient-to-br from-purple-100 to-pink-100 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:rotate-6 transition-transform">
+                  <Sparkles className="text-purple-500" size={28} />
+                </div>
+                <h3 className="font-bold text-gray-800 text-base sm:text-lg mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                  14+ Pro Filters
+                </h3>
+                <p className="text-gray-600 text-xs sm:text-sm leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Vintage, warm, cool, B&W and more. Instagram-worthy in seconds! ✨
+                </p>
+              </div>
+
+              <div className="feature-card group bg-white/90 backdrop-blur-sm rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all hover:scale-105 border border-rose-100 cursor-pointer">
+                <div className="bg-gradient-to-br from-rose-100 to-pink-100 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:rotate-6 transition-transform">
+                  <Palette className="text-rose-500" size={28} />
+                </div>
+                <h3 className="font-bold text-gray-800 text-base sm:text-lg mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                  Custom Frames
+                </h3>
+                <p className="text-gray-600 text-xs sm:text-sm leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  9 colors & 9 patterns. Make it uniquely yours with hearts, stars & more! 🎨
+                </p>
+              </div>
+
+              <div className="feature-card group bg-white/90 backdrop-blur-sm rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all hover:scale-105 border border-indigo-100 cursor-pointer">
+                <div className="bg-gradient-to-br from-indigo-100 to-purple-100 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:rotate-6 transition-transform">
+                  <Download className="text-indigo-500" size={28} />
+                </div>
+                <h3 className="font-bold text-gray-800 text-base sm:text-lg mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                  Instant Download
+                </h3>
+                <p className="text-gray-600 text-xs sm:text-sm leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  High-quality PNG export. Share on social media instantly! 💾
+                </p>
+              </div>
+            </div> */}
       {/* Stats Section */}
       <section className="stats-section py-16 px-4">
         <div className="max-w-6xl mx-auto">

@@ -291,6 +291,13 @@ function Booth() {
                 Home
               </button>
               <Link 
+                to="/creatortools"
+                className="text-base text-gray-700 hover:text-pink-600 font-medium transition-colors"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                Creator Tools
+              </Link>
+              <Link 
                 to="/about"
                 className="text-base text-gray-700 hover:text-pink-600 font-medium transition-colors"
                 style={{ fontFamily: 'Inter, sans-serif' }}
@@ -347,6 +354,14 @@ function Booth() {
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 About
+              </Link>
+              <Link 
+                to="/creatortools"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mobile-menu-item block w-full text-left text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                Creator Tools
               </Link>
               <Link 
                 to="/contact"
@@ -459,7 +474,56 @@ function Booth() {
                     See How It Works →
                   </button>
                 </div>
-
+                  {/* NEW: Creator Tools Banner - Strategic placement after hero */}
+            <div className="mt-12 sm:mt-16 px-4">
+              <Link to="/creatortools">
+                <div className="relative bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 rounded-3xl p-8 sm:p-12 shadow-2xl hover:shadow-purple-300/50 transition-all hover:scale-[1.02] cursor-pointer overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-rose-500 via-pink-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  
+                  {/* Floating elements */}
+                  <div className="absolute top-4 right-4 text-3xl sm:text-4xl opacity-30 group-hover:scale-110 transition-transform">✨</div>
+                  <div className="absolute bottom-4 left-4 text-3xl sm:text-4xl opacity-30 group-hover:scale-110 transition-transform">🎨</div>
+                  <div className="absolute top-1/2 right-1/4 text-2xl sm:text-3xl opacity-20 hidden sm:block">🚀</div>
+                  
+                  <div className="relative z-10 text-center">
+                    <div className="inline-block mb-3">
+                      <span className="bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-white text-xs sm:text-sm font-bold border border-white/30">
+                        ✨ NEW FEATURE
+                      </span>
+                    </div>
+                    
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-3 sm:mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                      AI-Powered Creator Tools
+                    </h2>
+                    
+                    <p className="text-white/95 text-base sm:text-lg md:text-xl max-w-3xl mx-auto mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      Take your content to the next level! Generate captions, remove backgrounds, create hashtags, and more with our professional AI tools.
+                    </p>
+                    
+                    <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-6">
+                      <div className="flex items-center gap-2 text-white/90 text-sm sm:text-base" style={{ fontFamily: 'Inter, sans-serif' }}>
+                        <Sparkles size={18} className="flex-shrink-0" />
+                        <span>AI Caption Generator</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-white/90 text-sm sm:text-base" style={{ fontFamily: 'Inter, sans-serif' }}>
+                        <TrendingUp size={18} className="flex-shrink-0" />
+                        <span>Hashtag Generator</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-white/90 text-sm sm:text-base" style={{ fontFamily: 'Inter, sans-serif' }}>
+                        <CameraIcon size={18} className="flex-shrink-0" />
+                        <span>Background Remover</span>
+                      </div>
+                    </div>
+                    
+                    <button className="bg-white text-purple-600 px-6 sm:px-10 py-3 sm:py-4 rounded-xl text-base sm:text-lg font-bold shadow-xl hover:shadow-2xl hover:scale-110 transition-all inline-flex items-center gap-2 sm:gap-3 group-hover:bg-yellow-50" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      <span>Explore Creator Tools</span>
+                      <Zap size={20} className="group-hover:rotate-12 transition-transform" />
+                    </button>
+                  </div>
+                </div>
+              </Link>
+            </div>
+            
                 {/* Social Proof Stats */}
                 <div className="mt-12 grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto">
                   <div className="text-center">
@@ -1098,6 +1162,13 @@ function Booth() {
                   <Link to="/about" className="block text-gray-600 hover:text-pink-600" style={{ fontFamily: 'Inter, sans-serif' }}>
                     About
                   </Link>
+                   <Link 
+                to="/creatortools"
+                className="text-base text-gray-700 hover:text-pink-600 font-medium transition-colors"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                Creator Tools
+              </Link>
                   <Link to="/contact" className="block text-gray-600 hover:text-pink-600" style={{ fontFamily: 'Inter, sans-serif' }}>
                     Contact
                   </Link>
