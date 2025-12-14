@@ -8,9 +8,11 @@ import ThumbnailGenerator from '../components/CreatorTools/ThumbnailGenerator';
 import CaptionGenerator from '../components/CreatorTools/CaptionGenerator';
 import HashtagGenerator from '../components/CreatorTools/HashtagGenerator';
 import BackgroundRemover from '../components/CreatorTools/BackgroundRemover';
+import ScrollTotop from'../components/ScrollTotop';
 function App() {
   return (
     <BrowserRouter>
+    <ScrollTotop/>
       <Routes>
         <Route path="/" element={<Booth />} />
         <Route path="/about" element={<About />} />

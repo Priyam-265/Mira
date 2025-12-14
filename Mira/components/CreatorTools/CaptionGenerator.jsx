@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Instagram, Mail, Heart, Sparkles, Copy, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Instagram, Mail, Heart, Sparkles, Copy, ArrowLeft, RefreshCw,Clock } from 'lucide-react';
 import gsap from 'gsap';
 
 function CaptionGenerator() {
@@ -409,7 +409,9 @@ function CaptionGenerator() {
                 </button>
               </div>
             ) : (
+              
               <div className="bg-white rounded-2xl shadow-lg p-12 border border-gray-100 text-center">
+                
                 <Sparkles className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <p className="text-gray-500">Your generated caption will appear here</p>
               </div>
@@ -417,6 +419,7 @@ function CaptionGenerator() {
 
             {/* Tips */}
             <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6 border border-purple-200">
+              <p className="text-sm text-purple-900 font-medium mb-3"> ⏰ First-time requests may take 30-60 seconds as our server wakes up. Subsequent requests will be instant!</p>
               <p className="text-sm text-purple-900 font-medium mb-3">💡 Tips for better captions:</p>
               <ul className="text-sm text-purple-800 space-y-2">
                 <li>• Be specific about your content</li>

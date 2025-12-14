@@ -346,6 +346,7 @@ function BackgroundRemover() {
               </label>
 
               <div className="mt-8 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200">
+                <p className="text-sm text-indigo-900 font-medium mb-3">⏰ First-time requests may take 30-60 seconds as our server wakes up. Subsequent requests will be instant!</p>
                 <p className="text-sm text-indigo-900 font-medium mb-3">✨ Perfect for:</p>
                 <ul className="text-sm text-indigo-800 space-y-2">
                   <li>• Product photography</li>

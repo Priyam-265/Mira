@@ -432,6 +432,7 @@ function HashtagGenerator() {
 
             {/* Tips */}
             <div className="bg-gradient-to-r from-teal-50 to-green-50 rounded-2xl p-6 border border-teal-200">
+              <p className="text-sm text-teal-900 font-medium mb-3">⏰ First-time requests may take 30-60 seconds as our server wakes up. Subsequent requests will be instant!</p>
               <p className="text-sm text-teal-900 font-medium mb-3">💡 Hashtag best practices:</p>
               <ul className="text-sm text-teal-800 space-y-2">
                 <li>• Mix popular and niche hashtags</li>
