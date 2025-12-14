@@ -201,16 +201,15 @@ function HashtagGenerator() {
                     {mobileMenuOpen && (
                       <div className="mobile-menu-container md:hidden bg-white/95 backdrop-blur-md border-t border-pink-200 shadow-lg overflow-hidden">
                         <div className="px-4 py-3 space-y-1">
-                          <button 
+                          <Link to="/"
                             onClick={() => {
-                              setStep('home');
                               setMobileMenuOpen(false);
                             }}
                             className="mobile-menu-item block w-full text-left text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
                             style={{ fontFamily: 'Inter, sans-serif' }}
                           >
                             Home
-                          </button>
+                          </Link>
                           <Link 
                             to="/about"
                             onClick={() => setMobileMenuOpen(false)}
