@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, Upload, X, Instagram, Mail, Heart, Image as ImageIcon } from 'lucide-react';
 import gsap from 'gsap';
@@ -159,123 +159,42 @@ const response = await fetch(`${API_URL}/api/creator/generate`, {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50 flex flex-col">
-      {/* Navbar */}
-     <nav className="bg-white/80 backdrop-blur-md shadow-lg border-b border-pink-200 sticky top-0 z-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
-              <div className="flex items-center justify-between">
-                <button 
-                  onClick={() => setStep('home')}
-                  className="text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-rose-500 cursor-pointer"
-                  style={{ fontFamily: 'Outfit, sans-serif', letterSpacing: '0.5px' }}
-                >
-                  Mira
-                </button>
-                
-                {/* Desktop Navigation */}
-                <div className="hidden md:flex items-center gap-6">
-                  <button 
-                    onClick={() => setStep('home')}
-                    className="text-base text-gray-700 hover:text-pink-600 font-medium transition-colors"
-                    style={{ fontFamily: 'Inter, sans-serif' }}
-                  >
-                    Home
-                  </button>
-                  <Link 
-                    to="/creatortools"
-                    className="text-base text-gray-700 hover:text-pink-600 font-medium transition-colors"
-                    style={{ fontFamily: 'Inter, sans-serif' }}
-                  >
-                    Creator Tools
-                  </Link>
-                  <Link 
-                    to="/about"
-                    className="text-base text-gray-700 hover:text-pink-600 font-medium transition-colors"
-                    style={{ fontFamily: 'Inter, sans-serif' }}
-                  >
-                    About
-                  </Link>
-                  <Link
-                    to='/contact'
-                    className="text-base text-gray-700 hover:text-pink-600 font-medium transition-colors"
-                    style={{ fontFamily: 'Inter, sans-serif' }}
-                  >
-                    Contact
-                  </Link>
-                  <a 
-                    href="https://www.instagram.com/mira.capturemoments?igsh=ZGEwbXVvdG54aHVw" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-gray-700 hover:text-pink-600 transition-colors"
-                  >
-                    <Instagram size={20} />
-                  </a>
-                </div>
-    
-                {/* Mobile Hamburger */}
-                <button 
-                  className="md:hidden relative w-8 h-8 flex flex-col items-center justify-center gap-1.5"
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                >
-                  <span className="hamburger-line-1 w-6 h-0.5 bg-gray-700 rounded-full block origin-center"></span>
-                  <span className="hamburger-line-2 w-6 h-0.5 bg-gray-700 rounded-full block origin-center"></span>
-                  <span className="hamburger-line-3 w-6 h-0.5 bg-gray-700 rounded-full block origin-center"></span>
-                </button>
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col">
+      <nav className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-lg border-b border-pink-200 dark:border-gray-700 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+          <div className="flex items-center justify-between">
+            <Link to="/" className="text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-rose-500" style={{ fontFamily: 'Outfit, sans-serif', letterSpacing: '0.5px' }}>
+              Mira
+            </Link>
+            <div className="hidden md:flex items-center gap-6">
+              <Link to="/" className="text-base text-gray-700 dark:text-gray-300 hover:text-pink-600 font-medium transition-colors">Home</Link>
+              <Link to="/creatortools" className="text-base text-gray-700 dark:text-gray-300 hover:text-pink-600 font-medium transition-colors">Creator Tools</Link>
+              <Link to="/gallery" className="text-base text-gray-700 dark:text-gray-300 hover:text-pink-600 font-medium transition-colors">Gallery</Link>
+              <Link to="/about" className="text-base text-gray-700 dark:text-gray-300 hover:text-pink-600 font-medium transition-colors">About</Link>
+              <Link to="/contact" className="text-base text-gray-700 dark:text-gray-300 hover:text-pink-600 font-medium transition-colors">Contact</Link>
+              <a href="https://www.instagram.com/mira.capturemoments?igsh=ZGEwbXVvdG54aHVw" target="_blank" rel="noopener noreferrer" className="text-gray-700 dark:text-gray-300 hover:text-pink-600 transition-colors">
+                <Instagram size={20} />
+              </a>
             </div>
-    
-            {/* Mobile Menu */}
-            {mobileMenuOpen && (
-              <div className="mobile-menu-container md:hidden bg-white/95 backdrop-blur-md border-t border-pink-200 shadow-lg overflow-hidden">
-                <div className="px-4 py-3 space-y-1">
-                  <Link to="/" 
-                    onClick={() => {
-                      
-                      setMobileMenuOpen(false);
-                    }}
-                    className="mobile-menu-item block w-full text-left text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
-                    style={{ fontFamily: 'Inter, sans-serif' }}
-                  >
-                    Home
-                  </Link>
-                  <Link 
-                    to="/about"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="mobile-menu-item block w-full text-left text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
-                    style={{ fontFamily: 'Inter, sans-serif' }}
-                  >
-                    About
-                  </Link>
-                  <Link 
-                    to="/creatortools"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="mobile-menu-item block w-full text-left text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
-                    style={{ fontFamily: 'Inter, sans-serif' }}
-                  >
-                    Creator Tools
-                  </Link>
-                  <Link 
-                    to="/contact"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="mobile-menu-item block w-full text-left text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
-                    style={{ fontFamily: 'Inter, sans-serif' }}
-                  >
-                    Contact
-                  </Link>
-                  <a 
-                    href="https://www.instagram.com/mira.capturemoments?igsh=ZGEwbXVvdG54aHVw" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="mobile-menu-item flex items-center gap-2 text-gray-700 hover:text-pink-600 hover:bg-pink-50 font-medium transition-colors py-3 px-4 rounded-lg"
-                    style={{ fontFamily: 'Inter, sans-serif' }}
-                  >
-                    <Instagram size={20} />
-                    <span>Instagram</span>
-                  </a>
-                </div>
-              </div>
-            )}
-          </nav>
+            <button className="md:hidden relative w-8 h-8 flex flex-col items-center justify-center gap-1.5" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle menu">
+              <span className="w-6 h-0.5 bg-gray-700 dark:bg-gray-300 rounded-full block origin-center transition-transform"></span>
+              <span className="w-6 h-0.5 bg-gray-700 dark:bg-gray-300 rounded-full block"></span>
+              <span className="w-6 h-0.5 bg-gray-700 dark:bg-gray-300 rounded-full block origin-center transition-transform"></span>
+            </button>
+          </div>
+        </div>
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-t border-pink-200 dark:border-gray-700 shadow-lg">
+            <div className="px-4 py-3 space-y-1">
+              <Link to="/" onClick={() => setMobileMenuOpen(false)} className="block w-full text-left text-gray-700 dark:text-gray-300 hover:text-pink-600 hover:bg-pink-50 dark:hover:bg-gray-700 font-medium transition-colors py-3 px-4 rounded-lg">Home</Link>
+              <Link to="/creatortools" onClick={() => setMobileMenuOpen(false)} className="block w-full text-left text-gray-700 dark:text-gray-300 hover:text-pink-600 hover:bg-pink-50 dark:hover:bg-gray-700 font-medium transition-colors py-3 px-4 rounded-lg">Creator Tools</Link>
+              <Link to="/gallery" onClick={() => setMobileMenuOpen(false)} className="block w-full text-left text-gray-700 dark:text-gray-300 hover:text-pink-600 hover:bg-pink-50 dark:hover:bg-gray-700 font-medium transition-colors py-3 px-4 rounded-lg">Gallery</Link>
+              <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="block w-full text-left text-gray-700 dark:text-gray-300 hover:text-pink-600 hover:bg-pink-50 dark:hover:bg-gray-700 font-medium transition-colors py-3 px-4 rounded-lg">About</Link>
+              <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="block w-full text-left text-gray-700 dark:text-gray-300 hover:text-pink-600 hover:bg-pink-50 dark:hover:bg-gray-700 font-medium transition-colors py-3 px-4 rounded-lg">Contact</Link>
+            </div>
+          </div>
+        )}
+      </nav>
 
       {/* Header */}
       <div className="bg-white border-b border-gray-200">

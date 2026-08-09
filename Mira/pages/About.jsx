@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Sparkles, Camera, Zap, Award, Mail, Star, TrendingUp, Instagram, Shield,CameraIcon,Palette,Download } from 'lucide-react';
+import { Heart, Sparkles, Camera, Zap, Award, Mail, Star, TrendingUp, Instagram, Shield, Palette, Download } from 'lucide-react';
 
 function About() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -307,7 +307,7 @@ function About() {
                         <span>Hashtag Generator</span>
                       </div>
                       <div className="flex items-center gap-2 text-white/90 text-sm sm:text-base" style={{ fontFamily: 'Inter, sans-serif' }}>
-                        <CameraIcon size={18} className="flex-shrink-0" />
+                        <Camera size={18} className="flex-shrink-0" />
                         <span>Background Remover</span>
                       </div>
                     </div>
@@ -325,7 +325,7 @@ function About() {
             {/* <div className="features-section grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-12 sm:mt-20 px-4">
               <div className="feature-card group bg-white/90 backdrop-blur-sm rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all hover:scale-105 border border-pink-100 cursor-pointer">
                 <div className="bg-gradient-to-br from-pink-100 to-rose-100 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:rotate-6 transition-transform">
-                  <CameraIcon className="text-pink-500" size={28} />
+                  <Camera className="text-pink-500" size={28} />
                 </div>
                 <h3 className="font-bold text-gray-800 text-base sm:text-lg mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
                   6 Unique Layouts

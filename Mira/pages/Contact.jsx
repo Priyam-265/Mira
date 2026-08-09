@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Github, Mail, Phone, MapPin, Send, MessageSquare, CheckCircle, AlertCircle,Instagram,Shield} from 'lucide-react';
+import { Heart, Mail, Send, MessageSquare, CheckCircle, AlertCircle, Instagram, Shield } from 'lucide-react';
 
 function Contact() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

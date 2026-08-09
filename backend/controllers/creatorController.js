@@ -1,6 +1,7 @@
+const axios = require('axios');
 const { improvePrompt } = require('../services/deepseek');
 const { generateThumbnail } = require('../services/pollination');
-const { incrementUsage,userGenerations, DAILY_LIMIT} = require('../middleware/rateLimiter');
+const { incrementUsage, userGenerations, DAILY_LIMIT } = require('../middleware/rateLimiter');
 
 const ASPECT_RATIOS = {
   youtube: { width: 1280, height: 720 },
@@ -9,102 +10,88 @@ const ASPECT_RATIOS = {
   linkedin: { width: 1200, height: 627 }
 };
 
+const VALID_PLATFORMS = Object.keys(ASPECT_RATIOS);
+const MAX_STRING_LENGTH = 500;
+const MAX_HASHTAG_COUNT = 30;
+
+const sanitizeInput = (str, maxLen = MAX_STRING_LENGTH) => {
+  if (typeof str !== 'string') return '';
+  return str.trim().slice(0, maxLen);
+};
+
+const sanitizeError = (error) => {
+  const msg = error?.message || 'Unknown error';
+  if (msg.includes('api') || msg.includes('key') || msg.includes('token') || msg.includes('Bearer')) {
+    return 'An external service error occurred. Please try again.';
+  }
+  return msg.slice(0, 200);
+};
+
 const generateCreatorContent = async (req, res) => {
   try {
-    console.log('📥 Request received:', {
-      userIdea: req.body.userIdea,
-      platform: req.body.platform,
-      hasImage: !!req.body.imageUrl,
-      simpleMode: req.body.simpleMode
-    });
-
     const { userIdea, platform, imageUrl, simpleMode } = req.body;
 
-    if (!userIdea || !platform || !imageUrl) {
+    if (!userIdea || !platform) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required fields: userIdea, platform, imageUrl'
+        message: 'Missing required fields: userIdea, platform'
       });
     }
 
-    console.log('✅ Validation passed');
-    console.log('🎨 Starting generation for:', platform);
-    console.log('💡 User idea:', userIdea);
+    const cleanIdea = sanitizeInput(userIdea);
+    if (!cleanIdea) {
+      return res.status(400).json({ success: false, message: 'Invalid userIdea' });
+    }
+
+    if (!VALID_PLATFORMS.includes(platform)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid platform. Must be one of: ${VALID_PLATFORMS.join(', ')}`
+      });
+    }
 
     let finalPrompt;
     let caption;
 
-    // If simple mode is enabled, skip AI enhancement
     if (simpleMode) {
-      console.log('⚡ Simple mode: Using user prompt as-is');
-      finalPrompt = userIdea;
-      caption = `Check out this amazing ${platform} content! 🚀`;
+      finalPrompt = cleanIdea;
+      caption = `Check out this amazing ${platform} content!`;
     } else {
-      // Step 1: Improve prompt with AI
-      console.log('🔄 Step 1: Calling OpenRouter API...');
       let improvedContent;
       try {
-        improvedContent = await improvePrompt(userIdea, platform);
-        console.log('✅ OpenRouter response received');
+        improvedContent = await improvePrompt(cleanIdea, platform);
       } catch (aiError) {
-        console.error('❌ OpenRouter API failed:', aiError.message);
-        // Fallback to user's original idea
-        console.log('⚠️ Falling back to user prompt');
-        finalPrompt = userIdea;
-        caption = `Check out this amazing ${platform} content! 🚀`;
+        finalPrompt = cleanIdea;
+        caption = `Check out this amazing ${platform} content!`;
       }
-      
+
       if (improvedContent) {
-        // Parse the AI response
         const promptMatch = improvedContent.match(/PROMPT:\s*(.+?)(?=CAPTION:|$)/is);
         const captionMatch = improvedContent.match(/CAPTION:\s*(.+?)$/is);
-        
-        finalPrompt = promptMatch ? promptMatch[1].trim() : userIdea;
-        caption = captionMatch ? captionMatch[1].trim() : `Amazing ${platform} content! 🚀`;
+        finalPrompt = promptMatch ? promptMatch[1].trim() : cleanIdea;
+        caption = captionMatch ? captionMatch[1].trim() : `Amazing ${platform} content!`;
       }
     }
 
-    console.log('📝 Final prompt:', finalPrompt);
-    console.log('📱 Caption:', caption);
-
-    // Step 2: Generate thumbnail with Pollinations
-    console.log('🔄 Step 2: Generating image with Pollinations.ai...');
     const aspectRatio = ASPECT_RATIOS[platform];
-    
-    let thumbnailUrl;
-    try {
-      thumbnailUrl = await generateThumbnail(finalPrompt, imageUrl, aspectRatio);
-      console.log('✅ Thumbnail generated successfully');
-    } catch (imageError) {
-      console.error('❌ Image generation failed:', imageError.message);
-      throw imageError;
-    }
+    const thumbnailUrl = await generateThumbnail(finalPrompt, imageUrl, aspectRatio);
 
-    // Step 3: Increment usage
     const remaining = incrementUsage(req);
-    console.log('📊 Remaining generations:', remaining);
-
-    console.log('✅ Generation completed successfully');
 
     res.json({
       success: true,
       data: {
         thumbnail: thumbnailUrl,
-        caption: caption,
+        caption,
         prompt: finalPrompt,
-        platform: platform,
-        remaining: remaining
+        platform,
+        remaining
       }
     });
-
   } catch (error) {
-    console.error('❌❌❌ GENERATION ERROR ❌❌❌');
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
-    
     res.status(500).json({
       success: false,
-      message: error.message || 'Failed to generate content'
+      message: sanitizeError(error)
     });
   }
 };
@@ -113,14 +100,13 @@ const checkUsage = (req, res) => {
   const userIP = req.ip;
   const today = new Date().toDateString();
   const key = `${userIP}-${today}`;
-  
   const count = userGenerations?.get?.(key) || 0;
-  
+
   res.json({
     success: true,
     used: count,
-    remaining: DAILY_LIMIT - count,  
-    total: DAILY_LIMIT                
+    remaining: DAILY_LIMIT - count,
+    total: DAILY_LIMIT
   });
 };
 
@@ -129,6 +115,13 @@ const checkUsage = (req, res) => {
 const CAPTION_LIMIT = 10;
 const captionGenerations = new Map();
 
+setInterval(() => {
+  const today = new Date().toDateString();
+  for (const key of captionGenerations.keys()) {
+    if (!key.endsWith(today)) captionGenerations.delete(key);
+  }
+}, 60 * 60 * 1000);
+
 const generateCaption = async (req, res) => {
   try {
     const { topic, tone, platform } = req.body;
@@ -136,22 +129,19 @@ const generateCaption = async (req, res) => {
     const today = new Date().toDateString();
     const key = `caption-${userIP}-${today}`;
 
-    // Check usage
     const count = captionGenerations.get(key) || 0;
     if (count >= CAPTION_LIMIT) {
-      return res.status(429).json({
-        success: false,
-        message: 'Daily caption limit reached!'
-      });
+      return res.status(429).json({ success: false, message: 'Daily caption limit reached!' });
     }
 
-    console.log('📝 Generating caption...');
-    console.log('Topic:', topic);
-    console.log('Tone:', tone);
-    console.log('Platform:', platform);
+    if (!topic || !tone || !platform) {
+      return res.status(400).json({ success: false, message: 'Missing required fields: topic, tone, platform' });
+    }
 
-    // Call AI to generate caption
-    const axios = require('axios');
+    const cleanTopic = sanitizeInput(topic);
+    const cleanTone = sanitizeInput(tone, 50);
+    const cleanPlatform = sanitizeInput(platform, 20);
+
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
@@ -159,18 +149,16 @@ const generateCaption = async (req, res) => {
         messages: [
           {
             role: 'system',
-            content: `You are a social media caption expert. Create engaging, platform-appropriate captions.`
+            content: 'You are a social media caption expert. Create engaging, platform-appropriate captions.'
           },
           {
             role: 'user',
-            content: `Create a ${tone} caption for ${platform} about: "${topic}". 
-            
-Make it engaging, include relevant emojis, and keep it appropriate for ${platform}.
+            content: `Create a ${cleanTone} caption for ${cleanPlatform} about: "${cleanTopic}".
+Make it engaging, include relevant emojis, and keep it appropriate for ${cleanPlatform}.
 For Instagram: 150-200 characters with line breaks and emojis
 For Twitter: Under 280 characters, punchy
 For Facebook: Conversational, 100-150 characters
 For LinkedIn: Professional, 150-200 characters
-
 Just return the caption, nothing else.`
           }
         ],
@@ -181,30 +169,29 @@ Just return the caption, nothing else.`
         headers: {
           'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
           'Content-Type': 'application/json'
-        }
+        },
+        timeout: 30000
       }
     );
 
-    const caption = response.data.choices[0].message.content.trim();
+    const captionText = response.data?.choices?.[0]?.message?.content?.trim();
+    if (!captionText) {
+      throw new Error('Empty response from AI');
+    }
 
-    // Update usage
     captionGenerations.set(key, count + 1);
-
-    console.log('✅ Caption generated:', caption);
 
     res.json({
       success: true,
       data: {
-        caption: caption,
+        caption: captionText,
         remaining: CAPTION_LIMIT - (count + 1)
       }
     });
-
   } catch (error) {
-    console.error('❌ Caption generation error:', error.message);
     res.status(500).json({
       success: false,
-      message: error.message || 'Failed to generate caption'
+      message: sanitizeError(error)
     });
   }
 };
@@ -213,21 +200,22 @@ const checkCaptionUsage = (req, res) => {
   const userIP = req.ip;
   const today = new Date().toDateString();
   const key = `caption-${userIP}-${today}`;
-  
   const count = captionGenerations.get(key) || 0;
-  
-  res.json({
-    success: true,
-    used: count,
-    remaining: CAPTION_LIMIT - count,
-    total: CAPTION_LIMIT
-  });
+
+  res.json({ success: true, used: count, remaining: CAPTION_LIMIT - count, total: CAPTION_LIMIT });
 };
 
 // ==================== HASHTAG GENERATOR ====================
 
 const HASHTAG_LIMIT = 10;
 const hashtagGenerations = new Map();
+
+setInterval(() => {
+  const today = new Date().toDateString();
+  for (const key of hashtagGenerations.keys()) {
+    if (!key.endsWith(today)) hashtagGenerations.delete(key);
+  }
+}, 60 * 60 * 1000);
 
 const generateHashtags = async (req, res) => {
   try {
@@ -236,22 +224,19 @@ const generateHashtags = async (req, res) => {
     const today = new Date().toDateString();
     const key = `hashtag-${userIP}-${today}`;
 
-    // Check usage
     const usageCount = hashtagGenerations.get(key) || 0;
     if (usageCount >= HASHTAG_LIMIT) {
-      return res.status(429).json({
-        success: false,
-        message: 'Daily hashtag limit reached!'
-      });
+      return res.status(429).json({ success: false, message: 'Daily hashtag limit reached!' });
     }
 
-    console.log('🏷️ Generating hashtags...');
-    console.log('Topic:', topic);
-    console.log('Niche:', niche);
-    console.log('Count:', count);
+    if (!topic || !niche) {
+      return res.status(400).json({ success: false, message: 'Missing required fields: topic, niche' });
+    }
 
-    // Call AI to generate hashtags
-    const axios = require('axios');
+    const cleanTopic = sanitizeInput(topic);
+    const cleanNiche = sanitizeInput(niche, 100);
+    const tagCount = Math.min(Math.max(parseInt(count) || 10, 1), MAX_HASHTAG_COUNT);
+
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
@@ -259,19 +244,13 @@ const generateHashtags = async (req, res) => {
         messages: [
           {
             role: 'system',
-            content: `You are a social media hashtag expert. Generate relevant, trending hashtags.`
+            content: 'You are a social media hashtag expert. Generate relevant, trending hashtags.'
           },
           {
             role: 'user',
-            content: `Generate ${count} hashtags for ${niche} content about: "${topic}".
-
-Mix of:
-- Popular hashtags (high reach)
-- Niche hashtags (targeted audience)  
-- Branded hashtags (unique)
-
+            content: `Generate ${tagCount} hashtags for ${cleanNiche} content about: "${cleanTopic}".
+Mix of: popular hashtags (high reach), niche hashtags (targeted audience), branded hashtags (unique).
 Format: Return ONLY hashtags separated by spaces, like: #example #another #third
-
 No explanations, just the hashtags.`
           }
         ],
@@ -282,31 +261,30 @@ No explanations, just the hashtags.`
         headers: {
           'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
           'Content-Type': 'application/json'
-        }
+        },
+        timeout: 30000
       }
     );
 
-    const hashtagsText = response.data.choices[0].message.content.trim();
-    const hashtags = hashtagsText.split(/\s+/).filter(h => h.startsWith('#'));
+    const hashtagsText = response.data?.choices?.[0]?.message?.content?.trim();
+    if (!hashtagsText) {
+      throw new Error('Empty response from AI');
+    }
 
-    // Update usage
+    const hashtags = hashtagsText.split(/\s+/).filter(h => h.startsWith('#') && h.length > 1);
     hashtagGenerations.set(key, usageCount + 1);
-
-    console.log('✅ Hashtags generated:', hashtags);
 
     res.json({
       success: true,
       data: {
-        hashtags: hashtags,
+        hashtags: hashtags.slice(0, tagCount),
         remaining: HASHTAG_LIMIT - (usageCount + 1)
       }
     });
-
   } catch (error) {
-    console.error('❌ Hashtag generation error:', error.message);
     res.status(500).json({
       success: false,
-      message: error.message || 'Failed to generate hashtags'
+      message: sanitizeError(error)
     });
   }
 };
@@ -315,15 +293,9 @@ const checkHashtagUsage = (req, res) => {
   const userIP = req.ip;
   const today = new Date().toDateString();
   const key = `hashtag-${userIP}-${today}`;
-  
   const count = hashtagGenerations.get(key) || 0;
-  
-  res.json({
-    success: true,
-    used: count,
-    remaining: HASHTAG_LIMIT - count,
-    total: HASHTAG_LIMIT
-  });
+
+  res.json({ success: true, used: count, remaining: HASHTAG_LIMIT - count, total: HASHTAG_LIMIT });
 };
 
 // ==================== BACKGROUND REMOVER ====================
@@ -331,37 +303,43 @@ const checkHashtagUsage = (req, res) => {
 const BG_REMOVAL_LIMIT = 2;
 const bgRemovalGenerations = new Map();
 
+setInterval(() => {
+  const today = new Date().toDateString();
+  for (const key of bgRemovalGenerations.keys()) {
+    if (!key.endsWith(today)) bgRemovalGenerations.delete(key);
+  }
+}, 60 * 60 * 1000);
+
 const removeBackground = async (req, res) => {
+  const fs = require('fs');
+  let tempPath = null;
+
   try {
     const userIP = req.ip;
     const today = new Date().toDateString();
     const key = `bg-removal-${userIP}-${today}`;
 
-    // Check usage
     const count = bgRemovalGenerations.get(key) || 0;
     if (count >= BG_REMOVAL_LIMIT) {
-      return res.status(429).json({
-        success: false,
-        message: 'Daily limit reached! You can remove 2 backgrounds per day.'
-      });
+      return res.status(429).json({ success: false, message: 'Daily limit reached! You can remove 2 backgrounds per day.' });
     }
 
-    console.log('🎨 Removing background...');
-
-    // Check if image was uploaded
     if (!req.files || !req.files.image) {
-      return res.status(400).json({
-        success: false,
-        message: 'No image uploaded'
-      });
+      return res.status(400).json({ success: false, message: 'No image uploaded' });
+    }
+
+    if (!process.env.REMOVEBG_API_KEY) {
+      return res.status(503).json({ success: false, message: 'Background removal service is not configured' });
     }
 
     const imageFile = req.files.image;
-    const FormData = require('form-data');
-    const fs = require('fs');
-    const axios = require('axios');
+    tempPath = imageFile.tempFilePath;
 
-    // Create form data for Remove.bg API
+    if (!imageFile.mimetype.startsWith('image/')) {
+      return res.status(400).json({ success: false, message: 'Uploaded file must be an image' });
+    }
+
+    const FormData = require('form-data');
     const formData = new FormData();
     formData.append('image_file', fs.createReadStream(imageFile.tempFilePath), {
       filename: imageFile.name,
@@ -369,7 +347,6 @@ const removeBackground = async (req, res) => {
     });
     formData.append('size', 'auto');
 
-    // Call Remove.bg API
     const response = await axios.post(
       'https://api.remove.bg/v1.0/removebg',
       formData,
@@ -383,42 +360,24 @@ const removeBackground = async (req, res) => {
       }
     );
 
-    // Convert to base64
     const base64Image = Buffer.from(response.data).toString('base64');
     const imageUrl = `data:image/png;base64,${base64Image}`;
 
-    // Update usage
     bgRemovalGenerations.set(key, count + 1);
-
-    // Clean up temp file
-    if (imageFile.tempFilePath) {
-      fs.unlinkSync(imageFile.tempFilePath);
-    }
-
-    console.log('✅ Background removed successfully');
 
     res.json({
       success: true,
-      data: {
-        imageUrl: imageUrl,
-        remaining: BG_REMOVAL_LIMIT - (count + 1)
-      }
+      data: { imageUrl, remaining: BG_REMOVAL_LIMIT - (count + 1) }
     });
-
   } catch (error) {
-    console.error('❌ Background removal error:', error.message);
-    
-    // Clean up temp file on error
-    if (req.files && req.files.image && req.files.image.tempFilePath) {
-      try {
-        require('fs').unlinkSync(req.files.image.tempFilePath);
-      } catch (e) {}
-    }
-    
     res.status(500).json({
       success: false,
-      message: error.response?.data?.errors?.[0]?.title || error.message || 'Failed to remove background'
+      message: sanitizeError(error)
     });
+  } finally {
+    if (tempPath) {
+      try { fs.unlinkSync(tempPath); } catch (e) { /* already cleaned */ }
+    }
   }
 };
 
@@ -426,18 +385,11 @@ const checkBgRemovalUsage = (req, res) => {
   const userIP = req.ip;
   const today = new Date().toDateString();
   const key = `bg-removal-${userIP}-${today}`;
-  
   const count = bgRemovalGenerations.get(key) || 0;
-  
-  res.json({
-    success: true,
-    used: count,
-    remaining: BG_REMOVAL_LIMIT - count,
-    total: BG_REMOVAL_LIMIT
-  });
+
+  res.json({ success: true, used: count, remaining: BG_REMOVAL_LIMIT - count, total: BG_REMOVAL_LIMIT });
 };
 
-// Export all functions
 module.exports = {
   generateCreatorContent,
   checkUsage,
