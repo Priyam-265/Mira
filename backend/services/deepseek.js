@@ -9,13 +9,10 @@ const improvePrompt = async (userIdea, platform) => {
       linkedin: 'LinkedIn post (1.91:1) - professional, clean, business-focused'
     };
 
-    console.log('🤖 Calling OpenRouter API with DeepSeek V3.1...');
-    console.log('🔑 API Key exists:', !!process.env.OPENROUTER_API_KEY);
-
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
-        model: 'nex-agi/deepseek-v3.1-nex-n1:free',  // ← Correct DeepSeek model
+        model: 'nex-agi/deepseek-v3.1-nex-n1:free',
         messages: [
           {
             role: 'system',
@@ -44,13 +41,9 @@ CAPTION: [engaging social media caption with emojis]`
       }
     );
 
-    console.log('✅ DeepSeek V3.1 response received');
-    console.log('📝 Response:', response.data.choices[0].message.content);
     return response.data.choices[0].message.content;
 
   } catch (error) {
-    console.error('OpenRouter API Error:', error.response?.data || error.message);
-    
     if (error.response?.status === 401) {
       throw new Error('Invalid OpenRouter API key. Please check your .env file');
     } else if (error.response?.status === 429) {
@@ -60,7 +53,7 @@ CAPTION: [engaging social media caption with emojis]`
     } else if (error.code === 'ECONNABORTED') {
       throw new Error('Request timeout. Please try again.');
     }
-    
+
     throw new Error('Failed to improve prompt with AI');
   }
 };

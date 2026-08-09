@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, Image, Hash, User, FileVideo, Instagram, Mail, Heart, Zap, ArrowRight, Clock } from 'lucide-react';
+import { Sparkles, Image, Hash, User, FileVideo, Instagram, Heart, Zap, ArrowRight, Clock } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -42,9 +42,9 @@ const TOOLS = [
     description: 'Create stunning thumbnails for YouTube, Instagram, TikTok & LinkedIn',
     icon: Image,
     gradient: 'from-pink-500 to-rose-500',
-    available: false,
-    // path: '/creatortools/thumbnail',
-    comingSoon:true
+    available: true,
+    path: '/creatortools/thumbnail',
+    comingSoon: false
   },
   {
     id: 'profile-pic',

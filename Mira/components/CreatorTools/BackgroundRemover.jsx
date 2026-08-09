@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Instagram, Mail, Heart, Sparkles, Download, ArrowLeft, Upload, X, Image as ImageIcon } from 'lucide-react';
 import gsap from 'gsap';

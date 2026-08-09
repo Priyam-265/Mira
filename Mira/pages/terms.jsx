@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, Shield, FileText, Instagram, Home, Mail,Heart } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Shield, FileText, Instagram, Mail, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom'; 
 function LegalPages() {
   const [activePage, setActivePage] = useState(null);
