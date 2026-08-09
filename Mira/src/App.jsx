@@ -27,7 +27,6 @@ function LoadingSpinner() {
   );
 }
 
-// OJAS
 function App() {
   return (
     <ErrorBoundary>
